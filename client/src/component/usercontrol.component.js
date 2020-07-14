@@ -14,7 +14,7 @@ function UserControl() {
   })
 
   const getUserData = () => {
-    axios.get('http://localhost:5000/api/user')
+    axios.get('/api/user')
       .then(res => {
         setUsers(res.data)
       }
@@ -63,11 +63,11 @@ function UserControl() {
   })
 
   const roleUp = (id) => {
-    axios.get('http://localhost:5000/api/user/up', {params: {id: id}})
+    axios.get('/api/user/up', {params: {id: id}})
   }
 
   const roleDown = (id) => {
-    axios.get('http://localhost:5000/api/user/down', {params: {id: id}})
+    axios.get('/api/user/down', {params: {id: id}})
   }
 
   return (

@@ -36,7 +36,7 @@ function Topic(props) {
 
   const getTopic = () => {
     axios
-      .get("http://localhost:5000/topics/" + props.match.params.id)
+      .get("/topics/" + props.match.params.id)
       .then((response) => {
         console.log(response.data)
         if (
@@ -76,7 +76,7 @@ function Topic(props) {
 
   const getComments = () => {
     axios
-      .get("http://localhost:5000/topics/" + props.match.params.id, {
+      .get("/topics/" + props.match.params.id, {
         params: { action: "getComment" },
       })
       .then((response) => {
@@ -118,9 +118,9 @@ function Topic(props) {
       <img
         data-toggle="modal"
         data-target="#exampleModal"
-        src={`http://localhost:5000/${img.filename}`}
+        src={`/${img.filename}`}
         value={img.filename}
-        onClick={() => zoomImg(`http://localhost:5000/${img.filename}`)}
+        onClick={() => zoomImg(`/${img.filename}`)}
         className="card-img mb-md-2 mb-1"
       />
     );
@@ -136,7 +136,7 @@ function Topic(props) {
         <div
           className="img-thumbnail"
           style={{
-            backgroundImage: `url(http://localhost:5000/${topic.imageURL[0].filename})`,
+            backgroundImage: `url(/${topic.imageURL[0].filename})`,
           }}
         ></div>
       );
@@ -179,7 +179,7 @@ function Topic(props) {
       };
 
       axios
-        .post("http://localhost:5000/topics/" + props.match.params.id, data)
+        .post("/topics/" + props.match.params.id, data)
         .then((res) => {
           setComments(res.data);
         });
@@ -197,7 +197,7 @@ function Topic(props) {
       userID: UserProfile.getUserId(),
     };
     axios
-      .post("http://localhost:5000/topics/" + props.match.params.id, data)
+      .post("/topics/" + props.match.params.id, data)
       .then((res) => {
         if (res.data.success) {
           setLike(!like);

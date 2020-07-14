@@ -41,12 +41,12 @@ export default class EditTopic extends Component {
   }
 
   async componentDidMount() {
-    await axios.get('http://localhost:5000/topics/' + this.props.match.params.id)
+    await axios.get('/topics/' + this.props.match.params.id)
       .then(res => {
         this.setState({userID: res.data.topic.userID})
       })
 
-    axios.get('http://localhost:5000/topics/edit/'+ this.props.match.params.id, {params: {role: UserProfile.getUserRole(), userID: this.state.userID, userIDDelete: UserProfile.getUserId()}})
+    axios.get('/topics/edit/'+ this.props.match.params.id, {params: {role: UserProfile.getUserRole(), userID: this.state.userID, userIDDelete: UserProfile.getUserId()}})
       .then(res => {
         if (!res.data.status) {
           return this.props.history.push('/')
@@ -66,12 +66,12 @@ export default class EditTopic extends Component {
 
         var html = ''
         for (let index = 0; index < this.state.file.length; index++) {
-          html += `<img src="http://localhost:5000/${this.state.file[index].filename}" style="width: 200px; height: 200px" />`
+          html += `<img src="/${this.state.file[index].filename}" style="width: 200px; height: 200px" />`
         }
         document.getElementById("img-preview").innerHTML = html
       })
       
-      axios.get('http://localhost:5000')
+      axios.get('')
         .then(res => {
           this.setState({
             address: res.data
@@ -156,7 +156,7 @@ export default class EditTopic extends Component {
       }
     };
 
-    axios.post('http://localhost:5000/topics/update/' + this.props.match.params.id, formData, config)
+    axios.post('/topics/update/' + this.props.match.params.id, formData, config)
       .then(res => console.log(res.data))
 
       window.location = '/topics/'+this.props.match.params.id

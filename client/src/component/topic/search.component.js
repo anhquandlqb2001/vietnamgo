@@ -92,7 +92,7 @@ function Topics(props) {
   const getTopics = () => {
     axios
       .get(
-          `http://localhost:5000/topics/search?${searchAddress}&sortby=${sortOption}`
+          `/topics/search?${searchAddress}&sortby=${sortOption}`
       )
       .then((res) => {
         const data = res.data.tops;
@@ -123,7 +123,7 @@ function Topics(props) {
           <div className="col-md-4 col-4">
             <Link to={`/topics/${topic._id}`}>
               <img
-                src={`http://localhost:5000/${topic.imageURL[0].filename}`}
+                src={`/${topic.imageURL[0].filename}`}
                 alt="img"
                 className="card-img"
                 style={currentStyle}
@@ -187,7 +187,7 @@ function Topics(props) {
 
   const deleteTopic = (id, userID) => {
     axios
-      .delete("http://localhost:5000/topics/" + id, {
+      .delete("/topics/" + id, {
         params: {
           role: UserProfile.getUserRole(),
           userID: userID,

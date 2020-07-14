@@ -43,7 +43,7 @@ export default class Signup extends Component {
       username: this.state.username
     }
 
-    axios.post('http://localhost:5000/signup', data)
+    axios.post('/signup', data)
       .then(res => console.log(res.data))
   }
 

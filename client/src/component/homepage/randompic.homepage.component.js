@@ -47,7 +47,7 @@ export default class SlideShow extends Component {
   onSubmit(e) {
     e.preventDefault()
 
-    axios.post('http://localhost:5000/search/', null, { params: {
+    axios.post('/search/', null, { params: {
       search: this.state.search
     }})
       .then(async (res) => {

@@ -22,7 +22,7 @@ const SlideshowSlide = (props) => {
               <div className="each-slide">
                 <div
                   style={{
-                    backgroundImage: `url(http://localhost:5000/${img.filename})`,
+                    backgroundImage: `url(/${img.filename})`,
                   }}
                 >
                   <div
@@ -67,7 +67,7 @@ export default class FavouriteTopics extends Component {
   }
 
   componentDidMount() {
-    axios.get("http://localhost:5000/topics/favourite").then((res) => {
+    axios.get("/topics/favourite").then((res) => {
       console.log(res.data)
       this.setState({
         topic1ImgURL: res.data.topics[0].imageURL,
