@@ -36,7 +36,7 @@ export default class Signup extends Component {
   }
 
   onSubmit(e) {
-
+    e.preventDefault()
     const data = {
       email: this.state.email,
       password: this.state.password,
