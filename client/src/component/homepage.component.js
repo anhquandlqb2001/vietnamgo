@@ -28,7 +28,7 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    axios.get('/')
+    axios.get('/location')
       .then(res => {
         this.setState({
           address: res.data

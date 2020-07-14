@@ -42,8 +42,7 @@ export default class FavourPlace extends Component {
     this.updateDimensions = this.updateDimensions.bind(this);
   }
   componentDidMount() {
-    axios.get("/").then((res) => {
-      console.log('a', res.data)
+    axios.get("/location/favourite").then((res) => {
       this.setState({
         data: res.data,
       });
@@ -72,16 +71,16 @@ export default class FavourPlace extends Component {
         };
         const Medium = {
           // ≥768px
-          height: '250px'
+          height: "250px",
         };
 
         const Small = {
           // ≥576px
         };
 
-        const	ExtraSmall = {
-          index: 2
-        }
+        const ExtraSmall = {
+          index: 2,
+        };
 
         const styles =
           this.state.windowWidth >= 992
@@ -90,10 +89,9 @@ export default class FavourPlace extends Component {
             ? Medium
             : this.state.windowWidth >= 576
             ? Small
-            : ExtraSmall
+            : ExtraSmall;
 
-        return <SlideItem item={item} key={index} style={styles} /> 
-        
+        return <SlideItem item={item} key={index} style={styles} />;
       });
     } catch (error) {}
   }

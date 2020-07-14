@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
         break;
       case "watch":
         topics.sort((a, b) => {
-          return b.totalWatch - a.totalWatch;
+          return b.watched - a.watched;
         });
         break;
       case "like":
@@ -108,7 +108,7 @@ router.get("/search", async (req, res) => {
           break;
         case "watch":
           topics.sort((a, b) => {
-            return b.totalWatch - a.totalWatch;
+            return b.watched - a.watched;
           });
           break;
         case "like":

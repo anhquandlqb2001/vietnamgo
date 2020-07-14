@@ -6,9 +6,9 @@ const User = require('../models/user.models')
 const Location = require('../models/location.models');
 const { route } = require("./topics");
 
-router.get('/', async (req, res) => {
+router.get('/location/favourite', async (req, res) => {
   let out
-  const location = await Location.find().sort({totalWatch: -1}).limit(4).exec((e, result) => {
+  const location = await Location.find({}).sort({totalWatch: -1}).limit(4).exec((e, result) => {
     res.json(result)
   })
 })

@@ -14,6 +14,7 @@ mapboxgl.accessToken =
 
 function Topic(props) {
   const [topic, setTopic] = useState([]);
+  // const [coor, setCoor] = useState([])
   const [listImg, setListImg] = useState([]);
   const [comments, setComments] = useState([]);
   const [map, setMap] = useState(null);
@@ -48,6 +49,7 @@ function Topic(props) {
           let result = response.data.topic;
           result.username = response.data.username;
           setTopic(result);
+          // setCoor(result.coor)
           setCountLike(result.like.length);
           setLike(result.like.includes(UserProfile.getUserId()));
           setListImg(result.imageURL);
@@ -97,6 +99,7 @@ function Topic(props) {
   };
 
   useEffect(() => {
+    console.log(!topic.coor)
     const initializeMap = ({ setMap, mapContainer }) => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
@@ -105,13 +108,9 @@ function Topic(props) {
         zoom: 12,
       });
 
-      map.on("load", () => {
-        setMap(map);
-        map.resize();
-      });
     };
-    if (!map) initializeMap({ setMap, mapContainer });
-  }, [map, topic.coor]);
+    if (topic.coor) initializeMap({ setMap, mapContainer });
+  }, [topic.coor]);
 
   const renderListImg = listImg.map((img) => {
     return (
@@ -277,6 +276,7 @@ function Topic(props) {
               </div>
             </div>
           </div>
+
           <div className="card col-12 mt-5">
             <div className="card-body">
               <p className="card-title">Bản đồ</p>

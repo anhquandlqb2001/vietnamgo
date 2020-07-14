@@ -26,4 +26,10 @@ router.post('/add', upload.single('profile'), (req, res) => {
   res.json('Location added')
 })
 
+router.get('/', (req, res) => {
+  const location = Location.find({}, (e, result) => {
+    res.json(result)
+  })
+})
+
 module.exports = router

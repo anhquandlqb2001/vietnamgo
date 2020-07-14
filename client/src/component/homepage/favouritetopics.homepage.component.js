@@ -16,9 +16,9 @@ const SlideshowSlide = (props) => {
   return (
     <div className="slide-container">
       <Slide {...properties}>
-        {props.topicImgURL.map((img) => {
+        {props.topicImgURL.map((img, index) => {
           return (
-            <Link to={`/topics/${props.topicURL}`}>
+            <Link to={`/topics/${props.topicURL}`} key={index}>
               <div className="each-slide">
                 <div
                   style={{
@@ -68,17 +68,16 @@ export default class FavouriteTopics extends Component {
 
   componentDidMount() {
     axios.get("/topics/favourite").then((res) => {
-      console.log(res.data)
       this.setState({
-        topic1ImgURL: res.data.topics[0].imageURL,
-        topic2ImgURL: res.data.topics[1].imageURL,
-        topic3ImgURL: res.data.topics[2].imageURL,
-        topic1Title: res.data.topics[0].title,
-        topic2Title: res.data.topics[1].title,
-        topic3Title: res.data.topics[2].title,
-        topic1URL: res.data.topics[0]._id,
-        topic2URL: res.data.topics[1]._id,
-        topic3URL: res.data.topics[2]._id,
+        topic1ImgURL: res.data.topics[0]!==undefined ? res.data.topics[0].imageURL : [],
+        topic2ImgURL: res.data.topics[1]!==undefined ? res.data.topics[1].imageURL : [],
+        topic3ImgURL: res.data.topics[2]!==undefined ? res.data.topics[2].imageURL : [],
+        topic1Title: res.data.topics[0]!==undefined ? res.data.topics[0].title : '',
+        topic2Title: res.data.topics[1]!==undefined ? res.data.topics[1].title : '',
+        topic3Title: res.data.topics[2]!==undefined ? res.data.topics[2].title : '',
+        topic1URL: res.data.topics[0]!==undefined ? res.data.topics[0]._id : '',
+        topic2URL: res.data.topics[1]!==undefined ? res.data.topics[1]._id : '',
+        topic3URL: res.data.topics[2]!==undefined ? res.data.topics[2]._id : '',
       });
     });
 

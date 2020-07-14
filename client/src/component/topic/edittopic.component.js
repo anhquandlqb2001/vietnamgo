@@ -71,7 +71,7 @@ export default class EditTopic extends Component {
         document.getElementById("img-preview").innerHTML = html
       })
       
-      axios.get('')
+      axios.get('/location')
         .then(res => {
           this.setState({
             address: res.data

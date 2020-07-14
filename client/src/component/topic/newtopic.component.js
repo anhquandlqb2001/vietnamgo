@@ -39,8 +39,9 @@ export default class NewTopic extends Component {
   }
 
   componentDidMount() {
-    axios.get('')
+    axios.get('/location')
       .then(res => {
+        console.log(res.data)
         this.setState({
           address: res.data
         })
