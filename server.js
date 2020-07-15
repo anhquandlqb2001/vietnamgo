@@ -27,6 +27,7 @@ connection.once('open', () => {
 app.use(express.static(path.join(__dirname, "client", "build")))
 app.use(express.static("public/uploads"))
 app.use(express.static("public/locationimg"))
+app.use(express.static("public/slideimg"))
 app.use(cors())
 app.use(express.json())
 app.use('/', indexRouter)

@@ -7,6 +7,8 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import axios from "axios";
 import { Link } from "react-router-dom";
+import UserProfile from '../UserProfile'
+import auth from '../auth'
 
 export default class Home extends Component {
 
@@ -15,9 +17,12 @@ export default class Home extends Component {
 
     this.onChangeAddress = this.onChangeAddress.bind(this)
     this.onSubmit = this.onSubmit.bind(this)
+    this.onChangeImage = this.onChangeImage.bind(this)
+    this.onSaveSlideImage = this.onSaveSlideImage.bind(this)
     this.state = {
       search: '',
-      address: []
+      address: [],
+      files: []
     }
   }
 
@@ -50,6 +55,31 @@ export default class Home extends Component {
     }).then(res => console.log(res.data))
   }
 
+  onChangeImage(e) {
+    this.setState({
+      files: e.target.files
+    })
+  }
+  
+  onSaveSlideImage(e) {
+    e.preventDefault()
+    const fd = new FormData()
+    for (let index = 0; index < this.state.files.length; index++) {
+      const element = this.state.files[index];
+      fd.append("slide-img", element);
+    }
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
+
+    axios.post('/api/slideimg', fd, config)
+      .then(res => console.log(res.data))
+
+  }
+
   render() {
     return  (
       <div>
@@ -72,6 +102,18 @@ export default class Home extends Component {
                 state: { search: this.state.search.address }
               }} type="submit" className="btn btn-primary">Tìm kiếm</Link>
             </form>
+            {auth.isAdmin(UserProfile.getUserRole()) ? <div className="form-group">
+              <label>Thay background</label>
+              <input
+                type="file"
+                name="slide-img"
+                className="form-control-file"
+                id="slide-img"
+                onChange={this.onChangeImage}
+                multiple
+              />
+              <button type="submit" onClick={this.onSaveSlideImage}>Lưu</button>
+            </div> : ''}
           </div>
         <SlideShow />
         <div className="container">
