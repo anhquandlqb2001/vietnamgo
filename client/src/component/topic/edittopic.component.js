@@ -41,12 +41,12 @@ export default class EditTopic extends Component {
   }
 
   async componentDidMount() {
-    await axios.get('/topics/' + this.props.match.params.id)
+    await axios.get('/api/topics/' + this.props.match.params.id)
       .then(res => {
         this.setState({userID: res.data.topic.userID})
       })
 
-    axios.get('/topics/edit/'+ this.props.match.params.id, {params: {role: UserProfile.getUserRole(), userID: this.state.userID, userIDDelete: UserProfile.getUserId()}})
+    axios.get('/api/topics/edit/'+ this.props.match.params.id, {params: {role: UserProfile.getUserRole(), userID: this.state.userID, userIDDelete: UserProfile.getUserId()}})
       .then(res => {
         if (!res.data.status) {
           return this.props.history.push('/')
@@ -71,7 +71,7 @@ export default class EditTopic extends Component {
         document.getElementById("img-preview").innerHTML = html
       })
       
-      axios.get('/location')
+      axios.get('/api/location')
         .then(res => {
           this.setState({
             address: res.data
@@ -156,7 +156,7 @@ export default class EditTopic extends Component {
       }
     };
 
-    axios.post('/topics/update/' + this.props.match.params.id, formData, config)
+    axios.post('/api/topics/update/' + this.props.match.params.id, formData, config)
       .then(res => console.log(res.data))
 
       window.location = '/topics/'+this.props.match.params.id

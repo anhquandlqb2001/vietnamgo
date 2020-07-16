@@ -39,7 +39,7 @@ export default class NewTopic extends Component {
   }
 
   componentDidMount() {
-    axios.get("/location").then((res) => {
+    axios.get("/api/location").then((res) => {
       console.log(res.data);
       this.setState({
         address: res.data,
@@ -135,7 +135,7 @@ export default class NewTopic extends Component {
     };
 
     axios
-      .post("/topics/add", formData, config)
+      .post("/api/topics/add", formData, config)
       .then((res) => console.log(res.data));
 
     window.location = "/topics";

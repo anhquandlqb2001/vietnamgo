@@ -67,7 +67,7 @@ export default class FavouriteTopics extends Component {
   }
 
   componentDidMount() {
-    axios.get("/topics/favourite").then((res) => {
+    axios.get("/api/topics/favourite").then((res) => {
       this.setState({
         topic1ImgURL: res.data.topics[0]!==undefined ? res.data.topics[0].imageURL : [],
         topic2ImgURL: res.data.topics[1]!==undefined ? res.data.topics[1].imageURL : [],

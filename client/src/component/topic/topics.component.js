@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import UserProfile from "../../UserProfile";
 import auth from "../../auth";
 import mapboxgl from "mapbox-gl";
+import 'mapbox-gl/dist/mapbox-gl.css'
 import "../style.css";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
@@ -83,14 +84,12 @@ function Topics(props) {
   };
 
   const getTopics = () => {
-    axios
-      .get(`/topics?sortby=${sortOption}`)
-      .then((res) => {
-        const data = res.data.tops;
-        const slice = data.slice(offset, offset + perPage);
-        setTopics(slice);
-        setPageCount(Math.ceil(data.length / perPage));
-      });
+    axios.get(`/api/topics?sortby=${sortOption}`).then((res) => {
+      const data = res.data.tops;
+      const slice = data.slice(offset, offset + perPage);
+      setTopics(slice);
+      setPageCount(Math.ceil(data.length / perPage));
+    });
   };
 
   const handlePageClick = (e) => {
@@ -178,7 +177,7 @@ function Topics(props) {
 
   const deleteTopic = (id, userID) => {
     axios
-      .delete("/topics/" + id, {
+      .delete("/api/topics/" + id, {
         params: {
           role: UserProfile.getUserRole(),
           userID: userID,
@@ -208,12 +207,12 @@ function Topics(props) {
       {/* Sort by */}
       <div className="row mx-2">
         <div className="dropdown col-12">
-        {auth.isAdmin(UserProfile.getUserRole()) ||
-        auth.isCreator(UserProfile.getUserRole()) ? (
-          <Link to="/topics/add" className="btn btn-primary">
-            Tạo bài mới
-          </Link>
-        ) : null}
+          {auth.isAdmin(UserProfile.getUserRole()) ||
+          auth.isCreator(UserProfile.getUserRole()) ? (
+            <Link to="/topics/add" className="btn btn-primary">
+              Tạo bài mới
+            </Link>
+          ) : null}
           <button
             className="btn border border-success dropdown-toggle"
             type="button"

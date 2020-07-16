@@ -35,7 +35,7 @@ router.get("/location/favourite", async (req, res) => {
 //     })
 // })
 
-router.get("/api/slideimg", (req, res) => {
+router.get("/slideimg", (req, res) => {
   // console.log('aaa')
   const img = SlideImage.find({}, (e, result) => {
     res.json(result);
@@ -56,7 +56,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
-router.post("/api/slideimg", upload.array("slide-img"), async (req, res) => {
+router.post("/slideimg", upload.array("slide-img"), async (req, res) => {
   // console.log(req.files)
   try {
     const list = await SlideImage.find({}, (e, result) => {
@@ -86,19 +86,19 @@ router.post("/api/slideimg", upload.array("slide-img"), async (req, res) => {
   res.json("Background updated");
 });
 
-router.get("/api/user", async (req, res) => {
+router.get("/user", async (req, res) => {
   const users = await User.find({}, (e, result) => {
     res.json(result);
   });
 });
 
-router.get("/api/user/up", async (req, res) => {
+router.get("/user/up", async (req, res) => {
   const user = await User.findById(req.query.id);
   user.role = "creator";
   await user.save();
 });
 
-router.get("/api/user/down", async (req, res) => {
+router.get("/user/down", async (req, res) => {
   const user = await User.findById(req.query.id);
   user.role = "customer";
   await user.save();

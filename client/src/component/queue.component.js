@@ -44,7 +44,7 @@ function Queue() {
   }, [currentPage]);
 
   const getTopics = () => {
-    axios.get(`/topics/queue`).then((res) => {
+    axios.get(`/api/topics/queue`).then((res) => {
       const data = res.data.tops;
       const slice = data.slice(offset, offset + perPage);
       setTopics(slice);
@@ -146,7 +146,9 @@ function Queue() {
                 {topic.status === "queue" &&
                 auth.isAdmin(UserProfile.getUserRole()) ? (
                   <div className="d-flex justify-content-between mt-1">
-                    <p className="text-muted" style={{fontSize: '0.8rem'}}>Đang chờ duyệt</p>
+                    <p className="text-muted" style={{ fontSize: "0.8rem" }}>
+                      Đang chờ duyệt
+                    </p>
                     <button
                       className="btn btn-sm btn-success"
                       onClick={() => accept(topic._id)}
@@ -172,7 +174,7 @@ function Queue() {
 
   const deleteTopic = (id, userID) => {
     axios
-      .delete("/topics/" + id, {
+      .delete("/api/topics/" + id, {
         params: {
           role: UserProfile.getUserRole(),
           userID: userID,
@@ -198,9 +200,7 @@ function Queue() {
   };
 
   const accept = (id) => {
-    axios
-      .post("/topics/accept/" + id)
-      .then((res) => console.log(res.data));
+    axios.post("/api/topics/accept/" + id).then((res) => console.log(res.data));
 
     setTopics(Topics.filter((el) => el._id != id));
   };

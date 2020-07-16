@@ -42,7 +42,7 @@ export default class FavourPlace extends Component {
     this.updateDimensions = this.updateDimensions.bind(this);
   }
   componentDidMount() {
-    axios.get("/location/favourite").then((res) => {
+    axios.get("/api/location/favourite").then((res) => {
       this.setState({
         data: res.data,
       });

@@ -38,7 +38,7 @@ export default class Navbar extends Component {
                     ? <div style={{display: 'contents'}}>
                           <Link className="dropdown-item" to="/location/add">Thêm địa điểm</Link>
                           <Link className="dropdown-item" to="/topics/queue">Duyệt bài</Link>
-                          <Link className="dropdown-item" to="/api/user">Quản lí thành viên</Link>
+                          <Link className="dropdown-item" to="/user">Quản lí thành viên</Link>
                       </div>
                     : auth.isCreator(UserProfile.getUserRole())
                     ? 

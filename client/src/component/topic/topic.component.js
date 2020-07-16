@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "./topic.css";
 import mapboxgl from "mapbox-gl";
+import 'mapbox-gl/dist/mapbox-gl.css'
 import "./topic.css";
 import auth from "../../auth";
 import UserProfile from "../../UserProfile";
@@ -37,7 +38,7 @@ function Topic(props) {
 
   const getTopic = () => {
     axios
-      .get("/topics/" + props.match.params.id)
+      .get("/api/topics/" + props.match.params.id)
       .then((response) => {
         console.log(response.data)
         if (
@@ -78,7 +79,7 @@ function Topic(props) {
 
   const getComments = () => {
     axios
-      .get("/topics/" + props.match.params.id, {
+      .get("/api/topics/" + props.match.params.id, {
         params: { action: "getComment" },
       })
       .then((response) => {
@@ -184,7 +185,7 @@ function Topic(props) {
       };
 
       axios
-        .post("/topics/" + props.match.params.id, data)
+        .post("/api/topics/" + props.match.params.id, data)
         .then((res) => {
           setComments(res.data);
         });
@@ -202,7 +203,7 @@ function Topic(props) {
       userID: UserProfile.getUserId(),
     };
     axios
-      .post("/topics/" + props.match.params.id, data)
+      .post("/api/topics/" + props.match.params.id, data)
       .then((res) => {
         if (res.data.success) {
           setLike(!like);

@@ -92,7 +92,7 @@ function Topics(props) {
   const getTopics = () => {
     axios
       .get(
-          `/topics/search?${searchAddress}&sortby=${sortOption}`
+          `/api/topics/search?${searchAddress}&sortby=${sortOption}`
       )
       .then((res) => {
         const data = res.data.tops;
@@ -187,7 +187,7 @@ function Topics(props) {
 
   const deleteTopic = (id, userID) => {
     axios
-      .delete("/topics/" + id, {
+      .delete("/api/topics/" + id, {
         params: {
           role: UserProfile.getUserRole(),
           userID: userID,

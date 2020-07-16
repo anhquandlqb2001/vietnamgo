@@ -29,7 +29,7 @@ function App() {
           <Route exact path="/topics">
             <Topics />
           </Route>
-          <RouteAdminPermission exact path="/api/user" component={UserControl} />
+          <RouteAdminPermission exact path="/user" component={UserControl} />
           <RouteAdminPermission exact path="/location/add" component={NewLocation} />
           <ProtectedRouteAuth exact path="/login" component={Login} />
           <ProtectedRouteAuth exact path="/signup" component={Signup} />

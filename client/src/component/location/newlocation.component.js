@@ -38,7 +38,7 @@ export default class NewLocation extends Component {
     fd.append('profile', this.state.image)
     fd.append('address', this.state.address)
 
-    axios.post('/location/add', fd)
+    axios.post('/api/location/add', fd)
       .then(res => console.log(res.data))
   }
 
