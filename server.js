@@ -1,39 +1,48 @@
-require('dotenv').config()
-const path = require('path');
-const express = require('express')
-const cors = require('cors')
-const mongoose = require('mongoose')
-const topicsRouter = require('./routers/topics');
-const signupRouter = require('./routers/signup');
-const indexRouter = require('./routers/index');
-const loginRouter = require('./routers/login');
-const locationRouter = require('./routers/location');
+require("dotenv").config();
+const path = require("path");
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const topicsRouter = require("./routers/topics");
+const signupRouter = require("./routers/signup");
+const indexRouter = require("./routers/index");
+const loginRouter = require("./routers/login");
+const locationRouter = require("./routers/location");
 
-const app = express()
-const port = process.env.PORT || 5000
+const app = express();
+const port = process.env.PORT || 5000;
 
 mongoose.connect(process.env.DATABASE_URL, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+  useUnifiedTopology: true,
+});
 
 // console.log(process.env.PORT)
 
-const connection = mongoose.connection
-connection.once('open', () => {
-  console.log('Connected to database')
-})
+const connection = mongoose.connection;
+connection.once("open", () => {
+  console.log("Connected to database");
+});
 
-app.use(express.static(path.join(__dirname, "client", "build")))
-app.use(express.static("public/uploads"))
-app.use(express.static("public/locationimg"))
-app.use(express.static("public/slideimg"))
-app.use(cors())
-app.use(express.json())
-app.use('/api', indexRouter)
-app.use('/api/topics', topicsRouter)
-app.use('/api/signup', signupRouter)
-app.use('/api/login', loginRouter)
-app.use('/api/location', locationRouter)
+app.use(express.static(path.join(__dirname, "client", "build")));
+console.log(path.resolve(__dirname))
 
-app.listen(process.env.PORT, "0.0.0.0", () => {console.log('Listen on port ' + process.env.PORT)})
+
+app.use(express.static("public/uploads"));
+app.use(express.static("public/locationimg"));
+app.use(express.static("public/slideimg"));
+app.use(cors());
+app.use(express.json());
+app.use("/api", indexRouter);
+app.use("/api/topics", topicsRouter);
+app.use("/api/signup", signupRouter);
+app.use("/api/login", loginRouter);
+app.use("/api/location", locationRouter);
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
+
+app.listen(process.env.PORT, "0.0.0.0", () => {
+  console.log("Listen on port " + process.env.PORT);
+});
