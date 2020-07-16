@@ -113,6 +113,10 @@ function Topic(props) {
   }, [topic.coor]);
 
   const renderListImg = listImg.map((img) => {
+    const heightOfImgCon = document.getElementById('img-container').clientHeight
+    const height = heightOfImgCon - (70*listImg.length)
+    const margin = height / listImg.length
+    console.log(margin)
     return (
       <img
         data-toggle="modal"
@@ -120,7 +124,9 @@ function Topic(props) {
         src={`/${img.filename}`}
         value={img.filename}
         onClick={() => zoomImg(`/${img.filename}`)}
-        className="card-img mb-md-2 mb-1"
+        className="card-img mb-md-2"
+        id="img-item"
+        style={{marginBottom: margin}}
       />
     );
   });
@@ -258,12 +264,12 @@ function Topic(props) {
             <div className="col-7 card">
               {!isMobile ? (
                 <ReactMarkdown
-                  className="text-body body-container"
+                  className="text-body"
                   source={topic.body}
                 />
               ) : (
                 <ReactMarkdown
-                  className="text-body body-container"
+                  className="text-body"
                   style={{ fontSize: "1rem", lineHeight: "1.2rem" }}
                   source={topic.body}
                 />

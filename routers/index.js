@@ -38,7 +38,6 @@ router.get("/location/favourite", async (req, res) => {
 router.get("/api/slideimg", (req, res) => {
   // console.log('aaa')
   const img = SlideImage.find({}, (e, result) => {
-    console.log(result);
     res.json(result);
   });
 });

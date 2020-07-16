@@ -41,7 +41,9 @@ router.get("/", (req, res) => {
           body: topic.body,
           coor: topic.coor,
           imageURL: topic.imageURL,
-          date: topic.date,
+          date: topic.date.toLocaleString("en-US", {
+            timeZone: "Asia/Ho_Chi_Minh",
+          }),
           _id: topic._id,
           watched: topic.watched,
           userID: topic.userID,
@@ -78,7 +80,9 @@ router.get("/queue", (req, res) => {
           body: topic.body,
           coor: topic.coor,
           imageURL: topic.imageURL,
-          date: topic.date,
+          date: topic.date.toLocaleString("en-US", {
+            timeZone: "Asia/Ho_Chi_Minh",
+          }),
           _id: topic._id,
           watched: topic.watched,
           userID: topic.userID,
@@ -185,7 +189,6 @@ router.get("/:id", async (req, res) => {
 router.post("/:id", async (req, res) => {
   let id = req.params.id;
   let topic = await Topic.findById(id);
-  console.log(req.body);
   if (req.body.likeAction && req.body.like == "false") {
     topic.like = [...topic.like, req.body.userID];
     await topic.save();
