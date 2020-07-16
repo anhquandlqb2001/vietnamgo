@@ -36,8 +36,4 @@ app.use('/api/signup', signupRouter)
 app.use('/api/login', loginRouter)
 app.use('/api/location', locationRouter)
 
-// app.listen(port, () => {
-//   console.log(`Listen on ${port}`)
-// })
-
-app.listen(process.env.PORT, "0.0.0.0", () => {console.log('app on port' + process.env.PORT)})
+app.listen(process.env.PORT, "0.0.0.0", () => {console.log('Listen on port ' + process.env.PORT)})
