@@ -6,10 +6,13 @@ function UserControl() {
   const [users, setUsers] = useState([]);
   const [windowWidth, setWindowWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(null);
+  const [reload, setReload] = useState(true)
 
   useEffect(() => {
     getUserData();
-  });
+    setReload(false)
+    
+  }, [reload]);
 
   const getUserData = () => {
     axios.get("/api/user").then((res) => {
@@ -98,13 +101,15 @@ function UserControl() {
   });
 
   const roleUp = (id) => {
+    setReload(true)
     axios.get("/api/user/up", { params: { id: id } });
   };
 
   const roleDown = (id) => {
+    setReload(true)
     axios.get("/api/user/down", { params: { id: id } });
   };
-
+  
   return <ul className="list-group">{userData}</ul>;
 }
 
