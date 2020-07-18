@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
-import UserProfile from "../UserProfile";
-import auth from "../auth";
+import UserProfile from "../../js/UserProfile";
+import auth from "../../js/auth";
 export default class Login extends Component {
   constructor(props) {
     super(props);

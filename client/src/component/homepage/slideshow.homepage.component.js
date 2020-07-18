@@ -28,13 +28,12 @@ export default class SlideShow extends Component {
   componentDidMount() {
     axios.get("/api/slideimg").then((res) => {
       const result = res.data !== undefined ? res.data[0].img : "";
-      console.log(result, 'a')
       this.setState({
         image: res.data,
       });
       try {
         const SlideList = result.map((el, index) => {
-          return <SlideItem img={el} index={index} />;
+          return <SlideItem img={el} index={index} key={index}/>;
         });
 
         this.setState({

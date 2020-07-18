@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import UserProfile from '../UserProfile'
-import './style.css'
-import auth from '../auth'
+import UserProfile from '../../js/UserProfile'
+import '../style.css'
+import auth from '../../js/auth'
 export default class Navbar extends Component {
   logout() {
     localStorage.clear()

@@ -5,8 +5,8 @@ import "./topic.css";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css'
 import "./topic.css";
-import auth from "../../auth";
-import UserProfile from "../../UserProfile";
+import auth from "../../js/auth";
+import UserProfile from "../../js/UserProfile";
 import ReactPaginate from "react-paginate";
 const ReactMarkdown = require("react-markdown");
 
@@ -40,7 +40,6 @@ function Topic(props) {
     axios
       .get("/api/topics/" + props.match.params.id)
       .then((response) => {
-        console.log(response.data)
         if (
           response.data.status === "queue" &&
           !auth.isAdmin(UserProfile.getUserRole())
@@ -100,7 +99,6 @@ function Topic(props) {
   };
 
   useEffect(() => {
-    console.log(!topic.coor)
     const initializeMap = ({ setMap, mapContainer }) => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
@@ -113,11 +111,10 @@ function Topic(props) {
     if (topic.coor) initializeMap({ setMap, mapContainer });
   }, [topic.coor]);
 
-  const renderListImg = listImg.map((img) => {
+  const renderListImg = listImg.map((img, index) => {
     const heightOfImgCon = document.getElementById('img-container').clientHeight
     const height = heightOfImgCon - (70*listImg.length)
     const margin = height / listImg.length
-    console.log(margin)
     return (
       <img
         data-toggle="modal"
@@ -128,6 +125,7 @@ function Topic(props) {
         className="card-img mb-md-2"
         id="img-item"
         style={{marginBottom: margin}}
+        key={index}
       />
     );
   });
@@ -148,9 +146,9 @@ function Topic(props) {
       );
   };
 
-  const commentList = comments.map((comment) => {
+  const commentList = comments.map((comment, index) => {
     return (
-      <div className="list-group-item list-group-item-action">
+      <div className="list-group-item list-group-item-action" key={index}>
         <div className="d-flex w-100 justify-content-between">
           <small>{comment.time}</small>
         </div>

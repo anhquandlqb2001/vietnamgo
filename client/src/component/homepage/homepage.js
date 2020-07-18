@@ -1,14 +1,14 @@
-import SlideShow from "./homepage/slideshow.homepage.component";
-import FavourPlace from "./homepage/favouriteplaces.homepage.component";
+import SlideShow from "./slideshow.homepage.component";
+import FavourPlace from "./favouriteplaces.homepage.component";
 // import RandomPic from './homepage/randompic.homepage.component'
-import FavouriteTopics from "./homepage/favouritetopics.homepage.component";
+import FavouriteTopics from "./favouritetopics.homepage.component";
 import React, { Component } from "react";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import UserProfile from "../UserProfile";
-import auth from "../auth";
+import UserProfile from "../../js/UserProfile";
+import auth from "../../js/auth";
 
 export default class Home extends Component {
   constructor(props) {

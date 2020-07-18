@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import data from '../../js/tinh-tp.json'
 import axios from 'axios'
 import './topic.css'
-import UserProfile from '../../UserProfile'
+import UserProfile from '../../js/UserProfile'
 const items = []
 var img
 

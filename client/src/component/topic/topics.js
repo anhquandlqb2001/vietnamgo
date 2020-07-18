@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link, useHistory } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import UserProfile from "../../UserProfile";
-import auth from "../../auth";
+import UserProfile from "../../js/UserProfile";
+import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css'
 import "../style.css";
@@ -103,11 +103,12 @@ function Topics(props) {
     height: "180px",
   };
 
-  const postData = Topics.map((topic) => {
+  const postData = Topics.map((topic, index) => {
     return (
       <div
         className="card mb-3 card-child-container overflow-hidden"
         style={currentStyle}
+        key={index}
       >
         <div className="row no-gutters">
           <div className="col-md-4 col-4">
@@ -272,7 +273,7 @@ function Topics(props) {
             nextClassName="page-item"
             nextLinkClassName="page-link"
             pageLinkClassName="page-link"
-            breakLabel={<Link className="page-link">...</Link>}
+            breakLabel={<Link to="" className="page-link">...</Link>}
             breakClassName="page-item"
             pageClassName="page-item"
             pageCount={pageCount}

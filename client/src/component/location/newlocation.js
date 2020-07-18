@@ -56,7 +56,7 @@ export default class NewLocation extends Component {
                 </select>
           </div>
           <div className="form-group">
-            <label for="exampleFormControlFile1">Ảnh</label>
+            <label>Ảnh</label>
             <input type="file" className="form-control-file" id="profile" onChange={this.onChangeImage}/>
           </div>
           <button type="submit" className="btn btn-success">Thêm</button>

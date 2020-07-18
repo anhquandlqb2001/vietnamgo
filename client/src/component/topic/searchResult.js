@@ -1,25 +1,34 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import "./style.css";
-import mapboxgl from "mapbox-gl";
+import { Link, useHistory } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import UserProfile from "../UserProfile";
-import auth from "../auth";
-
+import UserProfile from "../../js/UserProfile";
+import auth from "../../js/auth";
+import mapboxgl from "mapbox-gl";
+import "../style.css";
+import qs from 'query-string'
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
 
-function Queue() {
+function Topics(props) {
+  const history = useHistory();
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
   const [perPage, setperPage] = useState(10);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [coor, setCoor] = useState([108.2772, 14.0583]);
+  const [map, setMap] = useState(null);
   const [windowWidth, setWindowWidth] = useState(0);
   const [currentStyle, setCurrentStyle] = useState(null);
-  const [map, setMap] = useState(null);
+  const [sortOption, setSortOption] = useState(
+    // history.location.search.split("=")[1]'
+    'date'
+  );
+  const search = window.location.search.substring(1)
+  // console.log(search.split('&'))
+  const [searchAddress, setSearchAddress] = useState(search.split('&')[0])
+  const [sortTitle, setSortTitle] = useState('Theo ngày đăng')
   const mapContainer = useRef(null);
 
   useEffect(() => {
@@ -41,32 +50,34 @@ function Queue() {
 
   useEffect(() => {
     getTopics();
-  }, [currentPage]);
+    if (sortOption) {
+      history.push({
+        pathname: `/topics/search`,
+        search: `${searchAddress}&sortby=${sortOption}`,
+      });
+    }
 
-  const getTopics = () => {
-    axios.get(`/api/topics/queue`).then((res) => {
-      const data = res.data.tops;
-      const slice = data.slice(offset, offset + perPage);
-      setTopics(slice);
-      setPageCount(Math.ceil(data.length / perPage));
+    [
+      { id: "date", title: "Bài mới nhất" },
+      { id: "like", title: "Theo lượt thích" },
+      { id: "watch", title: "Theo lượt xem" },
+    ].map((item) => {
+      // (document.getElementById("sort-title").innerText = item.title))
+      // console
+        if (item.id === sortOption) {
+          document.getElementById(item.id).classList.add("active")
+          document.getElementById("sort-title").innerText = item.title
+        } else {
+          document.getElementById(item.id).classList.remove("active");
+        }
     });
-  };
 
-  const handlePageClick = (e) => {
-    const selectedPage = e.selected;
-    const offset = selectedPage * perPage;
-    setCurrentPage(selectedPage);
-    setoffset(offset);
-  };
+  }, [currentPage, sortOption]);
 
   useEffect(() => {
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
   }, [windowWidth]);
-
-  const styleMobile = {
-    height: "180px",
-  };
 
   const updateDimensions = () => {
     let width = typeof window !== "undefined" ? window.innerWidth : 0;
@@ -78,11 +89,36 @@ function Queue() {
     }
   };
 
-  const postData = Topics.map((topic) => {
+  const getTopics = () => {
+    axios
+      .get(
+          `/api/topics/search?${searchAddress}&sortby=${sortOption}`
+      )
+      .then((res) => {
+        const data = res.data.tops;
+        const slice = data.slice(offset, offset + perPage);
+        setTopics(slice);
+        setPageCount(Math.ceil(data.length / perPage));
+      });
+  };
+
+  const handlePageClick = (e) => {
+    const selectedPage = e.selected;
+    const offset = selectedPage * perPage;
+    setCurrentPage(selectedPage);
+    setoffset(offset);
+  };
+
+  const styleMobile = {
+    height: "180px",
+  };
+
+  const postData = Topics.map((topic, index) => {
     return (
       <div
-        className="card mb-3 card-child-container overflow-auto"
+        className="card mb-3 card-child-container overflow-hidden"
         style={currentStyle}
+        key={index}
       >
         <div className="row no-gutters">
           <div className="col-md-4 col-4">
@@ -116,7 +152,7 @@ function Queue() {
                 {(auth.isCreator(UserProfile.getUserRole()) &&
                   UserProfile.getUserId() === topic.userID) ||
                 auth.isAdmin(UserProfile.getUserRole()) ? (
-                  <div className="d-flex ml-4 admin-options">
+                  <div className="d-flex admin-options">
                     <Link
                       to={{
                         pathname: `/topics/edit/${topic._id}`,
@@ -142,29 +178,7 @@ function Queue() {
                   ""
                 )}
               </div>
-              <div>
-                {topic.status === "queue" &&
-                auth.isAdmin(UserProfile.getUserRole()) ? (
-                  <div className="d-flex justify-content-between mt-1">
-                    <p className="text-muted" style={{ fontSize: "0.8rem" }}>
-                      Đang chờ duyệt
-                    </p>
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => accept(topic._id)}
-                    >
-                      Duyệt
-                    </button>
-                  </div>
-                ) : topic.status === "queue" &&
-                  auth.isCreator(UserProfile.getUserRole()) ? (
-                  <div>
-                    <p className="text-muted">Đang chờ duyệt</p>
-                  </div>
-                ) : (
-                  ""
-                )}
-              </div>
+              <div></div>
             </div>
           </div>
         </div>
@@ -199,23 +213,59 @@ function Queue() {
     });
   };
 
-  const accept = (id) => {
-    axios.post("/api/topics/accept/" + id).then((res) => console.log(res.data));
-
-    setTopics(Topics.filter((el) => el._id != id));
-  };
-
   return (
     <div>
-      {auth.isAdmin(UserProfile.getUserRole()) ||
-      auth.isCreator(UserProfile.getUserRole()) ? (
-        <div className="container">
-          <Link to="/topics/add" className="btn btn-primary">
-            Tạo bài mới
-          </Link>
-        </div>
-      ) : null}
+      {/* Sort by */}
       <div className="row mx-2">
+        <div className="dropdown col-12">
+          <button
+            className="btn border border-success dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+            id="sort-title"
+          >
+            Bài mới nhất
+          </button>
+          <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a
+              className="dropdown-item"
+              onClick={() => {
+                setSortOption("date");
+                setSortTitle('Theo ngày đăng')
+              }}
+              // onMouseOver={(e) => {
+              //   e.target.classList.add('active')
+              //   onmouseout=((eve) => {eve.target.classList.remove('active')})
+              // }}
+              id="date"
+            >
+              Bài viết mới
+            </a>
+            <a
+              className="dropdown-item"
+              onClick={() => {
+                setSortOption("watch");
+                setSortTitle('Theo lượt xem')
+              }}
+              id="watch"
+            >
+              Lượt xem
+            </a>
+            <a
+              className="dropdown-item"
+              onClick={() => {
+                setSortOption("like");
+                setSortTitle('Theo lượt thích')
+              }}
+              id="like"
+            >
+              Lượt thích
+            </a>
+          </div>
+        </div>
         <div className="col-md-6 col-12 card-container">
           {postData}
 
@@ -227,7 +277,7 @@ function Queue() {
             nextClassName="page-item"
             nextLinkClassName="page-link"
             pageLinkClassName="page-link"
-            breakLabel={<Link className="page-link">...</Link>}
+            breakLabel={<Link to="" className="page-link">...</Link>}
             breakClassName="page-item"
             pageClassName="page-item"
             pageCount={pageCount}
@@ -249,4 +299,4 @@ function Queue() {
   );
 }
 
-export default Queue;
+export default Topics;

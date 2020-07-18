@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import auth from "../auth";
+import auth from "../../js/auth";
 
 function UserControl() {
   const [users, setUsers] = useState([]);
@@ -35,10 +35,10 @@ function UserControl() {
     }
   };
 
-  const userData = users.map((user) => {
+  const userData = users.map((user, index) => {
     if (!isMobile) {
       return (
-        <li className="list-group-item d-flex justify-content-between">
+        <li className="list-group-item d-flex justify-content-between" key={index}>
           <div>
             <div className="d-flex">
               Tên tài khoản:<p className="text-primary ml-1">{user.username}</p>
