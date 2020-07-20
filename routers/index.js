@@ -12,15 +12,6 @@ const uploadPath = path.join("public", "slideimg");
 const fs = require("fs");
 const { db } = require("../models/user.models");
 
-router.get("/location/favourite", async (req, res) => {
-  let out;
-  const location = await Location.find({})
-    .sort({ totalWatch: -1 })
-    .limit(4)
-    .exec((e, result) => {
-      res.json(result);
-    });
-});
 
 // router.post('/search', (req, res) => {
 //   let search = req.query.search
@@ -86,22 +77,5 @@ router.post("/slideimg", upload.array("slide-img"), async (req, res) => {
   res.json("Background updated");
 });
 
-router.get("/user", async (req, res) => {
-  const users = await User.find({}, (e, result) => {
-    res.json(result);
-  });
-});
-
-router.get("/user/up", async (req, res) => {
-  const user = await User.findById(req.query.id);
-  user.role = "creator";
-  await user.save();
-});
-
-router.get("/user/down", async (req, res) => {
-  const user = await User.findById(req.query.id);
-  user.role = "customer";
-  await user.save();
-});
 
 module.exports = router;

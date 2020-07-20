@@ -36,7 +36,7 @@ export default class Login extends Component {
       password: this.state.password,
     };
 
-    axios.post("/api/login", data).then((res) => {
+    axios.post("/api/auth/login", data).then((res) => {
       if (res.data.status) {
         UserProfile.setUsername(res.data.user.username);
         UserProfile.setIsLogin(res.data.status);

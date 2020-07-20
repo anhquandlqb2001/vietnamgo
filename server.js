@@ -4,10 +4,10 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const topicsRouter = require("./routers/topics");
-const signupRouter = require("./routers/signup");
 const indexRouter = require("./routers/index");
-const loginRouter = require("./routers/login");
+const authRouter = require("./routers/auth");
 const locationRouter = require("./routers/location");
+const userRouter = require("./routers/user");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -25,7 +25,6 @@ connection.once("open", () => {
 });
 
 app.use(express.static(path.join(__dirname, "client", "build")));
-console.log(path.resolve(__dirname))
 
 
 app.use(express.static("public/uploads"));
@@ -35,14 +34,15 @@ app.use(cors());
 app.use(express.json());
 app.use("/api", indexRouter);
 app.use("/api/topics", topicsRouter);
-app.use("/api/signup", signupRouter);
-app.use("/api/login", loginRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/location", locationRouter);
+app.use("/api/user", userRouter);
+
 
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
 });
 
-app.listen(process.env.PORT, "0.0.0.0", () => {
-  console.log("Listen on port " + process.env.PORT);
+app.listen(port, "0.0.0.0", () => {
+  console.log("Listen on port " + port);
 });

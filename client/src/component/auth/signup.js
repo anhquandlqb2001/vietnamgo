@@ -43,7 +43,7 @@ export default class Signup extends Component {
       username: this.state.username,
     };
 
-    axios.post("/api/signup", data).then((res) => console.log(res.data));
+    axios.post("/api/auth/register", data).then((res) => console.log(res.data));
   }
 
   render() {

@@ -32,4 +32,15 @@ router.get('/', (req, res) => {
   })
 })
 
+
+router.get("/favourite", async (req, res) => {
+  let out;
+  const location = await Location.find({})
+    .sort({ totalWatch: -1 })
+    .limit(4)
+    .exec((e, result) => {
+      res.json(result);
+    });
+});
+
 module.exports = router
