@@ -71,7 +71,7 @@ function UserControl() {
       );
     } else {
       return (
-        <li className="list-group-item">
+        <li className="list-group-item" key={index}>
           <div className="d-flex">
             Tên tài khoản:{" "}
             <p className="text-primary d-block">&nbsp;{user.username}</p>
@@ -110,7 +110,7 @@ function UserControl() {
     axios.get("/api/user/down", { params: { id: id } });
   };
   
-  return <ul className="list-group">{userData}</ul>;
+  return <ul className="list-group container">{userData}</ul>;
 }
 
 export default UserControl;

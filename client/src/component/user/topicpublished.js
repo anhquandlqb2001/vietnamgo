@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 // import "./style.css";
@@ -7,50 +7,31 @@ import ReactPaginate from "react-paginate";
 import UserProfile from "../../js/UserProfile";
 import auth from "../../js/auth";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
-
-function Queue() {
+function TopicPublished() {
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
   const [perPage, setperPage] = useState(10);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [coor, setCoor] = useState([108.2772, 14.0583]);
   const [windowWidth, setWindowWidth] = useState(0);
   const [currentStyle, setCurrentStyle] = useState(null);
-  const [map, setMap] = useState(null);
-  const mapContainer = useRef(null);
-
-  useEffect(() => {
-    const initializeMap = ({ setMap, mapContainer }) => {
-      const map = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: "mapbox://styles/mapbox/streets-v11", // stylesheet location
-        center: coor,
-        zoom: 6,
-      });
-
-      map.on("load", () => {
-        setMap(map);
-        map.resize();
-      });
-    };
-    if (!map) initializeMap({ setMap, mapContainer });
-  }, [map]);
-
   useEffect(() => {
     getTopics();
   }, [currentPage]);
-
   const getTopics = () => {
-    axios.get(`/api/topics/queue`).then((res) => {
-      const data = res.data.tops;
-      const slice = data.slice(offset, offset + perPage);
-      setTopics(slice);
-      setperPage(10)
-      setPageCount(Math.ceil(data.length / perPage));
-    });
+    axios
+      .get(`/api/topics/userpublished`, {
+        params: {
+          id: UserProfile.getUserId(),
+        },
+      })
+      .then((res) => {
+        const data = res.data.result;
+        const slice = data.slice(offset, offset + perPage);
+        setTopics(slice);
+        setperPage(10);
+        setPageCount(Math.ceil(data.length / perPage));
+      });
   };
 
   const handlePageClick = (e) => {
@@ -97,13 +78,7 @@ function Queue() {
               />
             </Link>
           </div>
-          <div
-            className="col-md-8 col-8 card-right h-100"
-            id={topic._id}
-            onClick={() => {
-              changeLocation(topic.coor, topic._id);
-            }}
-          >
+          <div className="col-md-8 col-8 card-right h-100" id={topic._id}>
             <div className="card-body p-1">
               <Link to={`/topics/${topic._id}`}>
                 <h5 className="card-title mb-1">{topic.title}</h5>
@@ -144,36 +119,13 @@ function Queue() {
                   ""
                 )}
               </div>
-              <div>
-                {topic.status === "queue" &&
-                auth.isAdmin(UserProfile.getUserRole()) ? (
-                  <div className="d-flex justify-content-between mt-1">
-                    <p className="text-muted" style={{ fontSize: "0.8rem" }}>
-                      Đang chờ duyệt
-                    </p>
-                    <button
-                      className="btn btn-sm btn-success"
-                      onClick={() => accept(topic._id)}
-                    >
-                      Duyệt
-                    </button>
-                  </div>
-                ) : topic.status === "queue" &&
-                  auth.isCreator(UserProfile.getUserRole()) ? (
-                  <div>
-                    <p className="text-muted">Đang chờ duyệt</p>
-                  </div>
-                ) : (
-                  ""
-                )}
-              </div>
+              <div></div>
             </div>
           </div>
         </div>
       </div>
     );
   });
-
   const deleteTopic = (id, userID) => {
     axios
       .delete("/api/topics/" + id, {
@@ -190,65 +142,42 @@ function Queue() {
     setTopics(Topics.filter((el) => el._id != id));
   };
 
-  const changeLocation = (coor, id) => {
-    setCoor(coor);
-    document.getElementById(id).addEventListener("click", function () {
-      map.flyTo({
-        center: coor,
-        essential: true,
-        zoom: 12,
-      });
-    });
-  };
-
-  const accept = (id) => {
-    axios.post("/api/topics/accept/" + id).then((res) => console.log(res.data));
-
-    setTopics(Topics.filter((el) => el._id != id));
-  };
-
   return (
-    <div>
-      {auth.isAdmin(UserProfile.getUserRole()) ||
-      auth.isCreator(UserProfile.getUserRole()) ? (
-        <div className="container">
-          <Link to="/topics/add" className="btn btn-primary">
-            Tạo bài mới
-          </Link>
-        </div>
-      ) : null}
-      <div className="row mx-2">
-        <div className="col-md-6 col-12 card-container">
-          {postData}
+    <div style={{}} className="container">
+      <div style={{}}>
+        {Topics == "" ? (
+          <h1 className="text-center">Chưa có bài viết nào</h1>
+        ) : (
+          ""
+        )}
+        {postData}
 
-          <ReactPaginate
-            previousLabel={"Trước"}
-            previousClassName="page-item"
-            previousLinkClassName="page-link"
-            nextLabel={"Tiếp theo"}
-            nextClassName="page-item"
-            nextLinkClassName="page-link"
-            pageLinkClassName="page-link"
-            breakLabel={<Link to="" className="page-link">...</Link>}
-            breakClassName="page-item"
-            pageClassName="page-item"
-            pageCount={pageCount}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            subContainerClassName={"pages pagination"}
-            activeClassName={"active"}
-          />
-        </div>
-        <div
-          ref={(el) => (mapContainer.current = el)}
-          id="map-container"
-          className="map-container col-md-6 d-none d-md-block"
-        ></div>
+        <ReactPaginate
+          previousLabel={"Trước"}
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextLabel={"Tiếp theo"}
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          pageLinkClassName="page-link"
+          breakLabel={
+            <Link to="" className="page-link">
+              ...
+            </Link>
+          }
+          breakClassName="page-item"
+          pageClassName="page-item"
+          pageCount={pageCount}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          subContainerClassName={"pages pagination"}
+          activeClassName={"active"}
+        />
       </div>
     </div>
   );
 }
 
-export default Queue;
+export default TopicPublished;

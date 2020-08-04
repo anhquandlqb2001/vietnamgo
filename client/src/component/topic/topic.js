@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "./topic.css";
 import mapboxgl from "mapbox-gl";
-import 'mapbox-gl/dist/mapbox-gl.css'
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./topic.css";
 import auth from "../../js/auth";
 import UserProfile from "../../js/UserProfile";
@@ -38,14 +38,23 @@ function Topic(props) {
 
   const getTopic = () => {
     axios
-      .get("/api/topics/" + props.match.params.id)
+      .get("/api/topics/" + props.match.params.id, {
+        params: {
+          id: UserProfile.getUserId(),
+          role: UserProfile.getUserRole(),
+        },
+      })
       .then((response) => {
-        if (
-          response.data.status === "queue" &&
-          !auth.isAdmin(UserProfile.getUserRole())
+        console.log(response.data);
+        if (!response.data.status) {
+          return props.history.push("/");
+        } else if (
+          (response.data.topic.status === "queue" &&
+            auth.isAdmin(UserProfile.getUserRole())) ||
+          (response.data.topic.status === "queue" &&
+            auth.isCreator(UserProfile.getUserRole())) ||
+          (response.data.status && response.data.topic.status === "published")
         ) {
-          return this.props.history.push("/");
-        } else {
           let result = response.data.topic;
           result.username = response.data.username;
           setTopic(result);
@@ -53,6 +62,8 @@ function Topic(props) {
           setCountLike(result.like.length);
           setLike(result.like.includes(UserProfile.getUserId()));
           setListImg(result.imageURL);
+        } else {
+          return props.history.push("/");
         }
       });
   };
@@ -82,11 +93,8 @@ function Topic(props) {
         params: { action: "getComment" },
       })
       .then((response) => {
-        if (
-          response.data.topic.status === "queue" &&
-          !auth.isAdmin(UserProfile.getUserRole())
-        ) {
-          return this.props.history.push("/");
+        console.log(response.data)
+        if (!response.data.status) {
         } else {
           let result = response.data.topic;
           result.username = response.data.username;
@@ -106,15 +114,15 @@ function Topic(props) {
         center: topic.coor,
         zoom: 12,
       });
-
     };
     if (topic.coor) initializeMap({ setMap, mapContainer });
   }, [topic.coor]);
 
   const renderListImg = listImg.map((img, index) => {
-    const heightOfImgCon = document.getElementById('img-container').clientHeight
-    const height = heightOfImgCon - (70*listImg.length)
-    const margin = height / listImg.length
+    const heightOfImgCon = document.getElementById("img-container")
+      .clientHeight;
+    const height = heightOfImgCon - 70 * listImg.length;
+    const margin = height / listImg.length;
     return (
       <img
         data-toggle="modal"
@@ -124,7 +132,7 @@ function Topic(props) {
         onClick={() => zoomImg(`/${img.filename}`)}
         className="card-img mb-md-2"
         id="img-item"
-        style={{marginBottom: margin}}
+        style={{ marginBottom: margin }}
         key={index}
       />
     );
@@ -182,11 +190,9 @@ function Topic(props) {
         text: newComment,
       };
 
-      axios
-        .post("/api/topics/" + props.match.params.id, data)
-        .then((res) => {
-          setComments(res.data);
-        });
+      axios.post("/api/topics/" + props.match.params.id, data).then((res) => {
+        setComments(res.data);
+      });
     }
   };
 
@@ -200,14 +206,12 @@ function Topic(props) {
       like: e.target.value,
       userID: UserProfile.getUserId(),
     };
-    axios
-      .post("/api/topics/" + props.match.params.id, data)
-      .then((res) => {
-        if (res.data.success) {
-          setLike(!like);
-          setCountLike(res.data.countLike);
-        }
-      });
+    axios.post("/api/topics/" + props.match.params.id, data).then((res) => {
+      if (res.data.success) {
+        setLike(!like);
+        setCountLike(res.data.countLike);
+      }
+    });
   };
 
   return (
@@ -262,10 +266,7 @@ function Topic(props) {
           <div className="d-flex w-100 justify-content-between">
             <div className="col-7 card">
               {!isMobile ? (
-                <ReactMarkdown
-                  className="text-body"
-                  source={topic.body}
-                />
+                <ReactMarkdown className="text-body" source={topic.body} />
               ) : (
                 <ReactMarkdown
                   className="text-body"

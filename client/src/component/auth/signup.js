@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
+import UserProfile from '../../js/UserProfile'
+import auth from '../../js/auth'
 
 export default class Signup extends Component {
   constructor(props) {
@@ -43,7 +45,19 @@ export default class Signup extends Component {
       username: this.state.username,
     };
 
-    axios.post("/api/auth/register", data).then((res) => console.log(res.data));
+    axios.post("/api/auth/register", data).then((res) => {
+      if (res.data.status) {
+        UserProfile.setUsername(res.data.userPackage.username);
+        UserProfile.setIsLogin(res.data.status);
+        UserProfile.setUserRole(res.data.userPackage.role);
+        UserProfile.setUserId(res.data.userPackage.id);
+        auth.login(() => {
+          window.location = "/";
+        });
+      } else {
+        alert(res.data.message);
+      }
+    });
   }
 
   render() {

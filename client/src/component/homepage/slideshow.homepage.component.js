@@ -6,13 +6,13 @@ const SlideItem = (props) => {
   if (props.index == 0) {
     return (
       <div className="carousel-item active">
-        <img src={props.img.filename} className="d-block w-100" alt="..." />
+        <img loading="lazy" src={props.img.filename} className="d-block w-100" alt="..." />
       </div>
     );
   }
   return (
     <div className="carousel-item">
-      <img src={props.img.filename} className="d-block w-100" alt="..." />
+      <img loading="lazy" src={props.img.filename} className="d-block w-100" alt="..." />
     </div>
   );
 };
@@ -27,7 +27,7 @@ export default class SlideShow extends Component {
 
   componentDidMount() {
     axios.get("/api/slideimg").then((res) => {
-      const result = res.data !== undefined ? res.data[0].img : "";
+      const result = res.data != '' ? res.data[0].img : "";
       this.setState({
         image: res.data,
       });

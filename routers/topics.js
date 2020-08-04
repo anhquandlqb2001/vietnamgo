@@ -6,6 +6,7 @@ const uploadController = require("../controller/upload.js");
 const updateController = require("../controller/update.js");
 const Location = require("../models/location.models");
 const fs = require("fs");
+const { EDESTADDRREQ } = require("constants");
 
 router.get("/", (req, res) => {
   const sortOption =
@@ -69,33 +70,63 @@ router.get("/favourite", (req, res) => {
 
 router.get("/queue", (req, res) => {
   var response;
-  Topic.find({ status: "queue" }).then((topics) => {
-    response = {
-      tops: topics.map((topic) => {
-        return {
-          title: topic.title,
-          address_pri: topic.address_pri,
-          address_sec: topic.address_sec,
-          description: topic.description,
-          body: topic.body,
-          coor: topic.coor,
-          imageURL: topic.imageURL,
-          date: topic.date.toLocaleString("en-US", {
-            timeZone: "Asia/Ho_Chi_Minh",
-          }),
-          _id: topic._id,
-          watched: topic.watched,
-          userID: topic.userID,
-          status: topic.status,
-          request: {
-            type: "GET",
-            url: "http://localhost:5000/topics/" + topic._id,
-          },
-        };
-      }),
-    };
-    res.status(200).json(response);
-  });
+  if (req.query.role === "admin") {
+    Topic.find({ status: "queue" }).then((topics) => {
+      response = {
+        tops: topics.map((topic) => {
+          return {
+            title: topic.title,
+            address_pri: topic.address_pri,
+            address_sec: topic.address_sec,
+            description: topic.description,
+            body: topic.body,
+            coor: topic.coor,
+            imageURL: topic.imageURL,
+            date: topic.date.toLocaleString("en-US", {
+              timeZone: "Asia/Ho_Chi_Minh",
+            }),
+            _id: topic._id,
+            watched: topic.watched,
+            userID: topic.userID,
+            status: topic.status,
+            request: {
+              type: "GET",
+              url: "http://localhost:5000/topics/" + topic._id,
+            },
+          };
+        }),
+      };
+      res.status(200).json(response);
+    });
+  } else {
+    Topic.find({ status: "queue", userID: req.query.id }).then((topics) => {
+      response = {
+        tops: topics.map((topic) => {
+          return {
+            title: topic.title,
+            address_pri: topic.address_pri,
+            address_sec: topic.address_sec,
+            description: topic.description,
+            body: topic.body,
+            coor: topic.coor,
+            imageURL: topic.imageURL,
+            date: topic.date.toLocaleString("en-US", {
+              timeZone: "Asia/Ho_Chi_Minh",
+            }),
+            _id: topic._id,
+            watched: topic.watched,
+            userID: topic.userID,
+            status: topic.status,
+            request: {
+              type: "GET",
+              url: "http://localhost:5000/topics/" + topic._id,
+            },
+          };
+        }),
+      };
+      res.status(200).json(response);
+    });
+  }
 });
 
 router.get("/search", async (req, res) => {
@@ -155,33 +186,68 @@ router.get("/search", async (req, res) => {
 
 router.post("/add", uploadController.uploadFiles);
 
+router.get("/userpublished", async (req, res) => {
+  let _id = req.query.id;
+
+  let topics = await Topic.find({ userID: _id, status: "published" }, (e, result) => {
+    res.json({ status: true, result })
+  })
+})
+
 router.get("/:id", async (req, res) => {
+  let _id = req.query.id;
   let id = req.params.id;
   let topic = await Topic.findById(id);
   let user = await User.findById(topic.userID);
-  if (!req.query.action) {
-    try {
-      topic.watched += 1;
-      await topic.save();
 
-      let location = await Location.find(
-        { address: topic.address_pri },
-        async (e, result) => {
-          result[0].totalWatch += 1;
-          await result[0].save();
-          res.json({ topic, username: user.username });
-        }
-      );
-    } catch (e) {}
+  if (topic.status === "published") {
+    if (!req.query.action) {
+      try {
+        topic.watched += 1;
+        await topic.save();
+
+        let location = await Location.find(
+          { address: topic.address_pri },
+          async (e, result) => {
+            result[0].totalWatch += 1;
+            await result[0].save();
+            res.json({ status: true, topic, username: user.username });
+          }
+        );
+      } catch (e) {}
+    }
+    if (req.query.action === "getComment") {
+      try {
+        topic.comments.sort(function (a, b) {
+          return new Date(b.time) - new Date(a.time);
+        });
+
+        res.json({ status: true, topic, username: user.username });
+      } catch (e) {
+        res.status(400);
+      }
+    }
   } else {
-    try {
-      topic.comments.sort(function (a, b) {
-        return new Date(b.time) - new Date(a.time);
-      });
+    if (
+      req.query.role == "admin" ||
+      (req.query.role === "creator" && topic.userID == _id)
+    ) {
+      if (!req.query.action) {
+        res.json({ status: true, topic, username: user.username });
+      }
+      if (req.query.action === "getComment") {
+        try {
+          topic.comments.sort(function (a, b) {
+            return new Date(b.time) - new Date(a.time);
+          });
 
-      res.json({ topic, username: user.username });
-    } catch (e) {
-      res.status(400);
+          res.json({ status: true, topic, username: user.username });
+        } catch (e) {
+          res.status(400);
+        }
+      }
+    } else {
+      return res.json({ status: false, message: "Khong du quyen" });
     }
   }
 });

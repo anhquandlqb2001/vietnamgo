@@ -48,7 +48,6 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 router.post("/slideimg", upload.array("slide-img"), async (req, res) => {
-  // console.log(req.files)
   try {
     const list = await SlideImage.find({}, (e, result) => {
       result.map((el) => {
@@ -74,7 +73,7 @@ router.post("/slideimg", upload.array("slide-img"), async (req, res) => {
     img: req.files,
   });
   const newSlideImg = await SlideImg.save();
-  res.json("Background updated");
+  res.json({status: true, message: "Đã cập nhật background"});
 });
 
 

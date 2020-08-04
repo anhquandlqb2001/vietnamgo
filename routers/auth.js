@@ -35,7 +35,12 @@ router.post('/register', checkEmailExist, async (req, res) => {
     })
     
     const user = await newUser.save()
-    res.json({user, message: 'Tạo tài khoản thành công'})
+    const userPackage = {
+      username: user.username,
+      role: user.role,
+      id: user._id
+    }
+    res.json({userPackage, status: true})
     
   } catch (error) {
     

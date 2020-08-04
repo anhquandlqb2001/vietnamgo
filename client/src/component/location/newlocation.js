@@ -39,12 +39,17 @@ export default class NewLocation extends Component {
     fd.append('address', this.state.address)
 
     axios.post('/api/location/add', fd)
-      .then(res => console.log(res.data))
+      .then(res => {
+        if (res.data.status) {
+          alert(res.data.message)
+          window.location = '/'
+        }
+      })
   }
 
   render() {
     return (
-      <div className="container">
+      <div>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
             <select id="inputState" className="form-control" value={this.state.address} onChange={this.onChangeAddress}>

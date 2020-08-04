@@ -5,7 +5,7 @@ import ReactPaginate from "react-paginate";
 import UserProfile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
-import 'mapbox-gl/dist/mapbox-gl.css'
+import "mapbox-gl/dist/mapbox-gl.css";
 import "../style.css";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
@@ -58,7 +58,6 @@ function Topics(props) {
       { id: "like", title: "Theo lượt thích" },
       { id: "watch", title: "Theo lượt xem" },
     ].map((item) => {
-      // (document.getElementById("sort-title").innerText = item.title))
       if (item.id === sortOption) {
         document.getElementById(item.id).classList.add("active");
         document.getElementById("sort-title").innerText = item.title;
@@ -67,11 +66,6 @@ function Topics(props) {
       }
     });
   }, [currentPage, sortOption]);
-
-  useEffect(() => {
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-  }, [windowWidth]);
 
   const updateDimensions = () => {
     let width = typeof window !== "undefined" ? window.innerWidth : 0;
@@ -83,6 +77,10 @@ function Topics(props) {
     }
   };
 
+  useEffect(() => {
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+  }, [windowWidth]);
   const getTopics = () => {
     axios.get(`/api/topics?sortby=${sortOption}`).then((res) => {
       const data = res.data.tops;
@@ -189,7 +187,7 @@ function Topics(props) {
         console.log(response.data);
       });
 
-    setTopics(Topics.filter((el) => el._id != id));
+    setTopics(Topics.filter((el) => el._id !== id));
   };
 
   const changeLocation = (coor, id) => {
@@ -207,13 +205,7 @@ function Topics(props) {
     <div>
       {/* Sort by */}
       <div className="row mx-2">
-        <div className="dropdown col-12">
-          {auth.isAdmin(UserProfile.getUserRole()) ||
-          auth.isCreator(UserProfile.getUserRole()) ? (
-            <Link to="/topics/add" className="btn btn-primary">
-              Tạo bài mới
-            </Link>
-          ) : null}
+        <div className="dropdown mb-2 col-12">
           <button
             className="btn border border-success dropdown-toggle"
             type="button"
@@ -273,7 +265,11 @@ function Topics(props) {
             nextClassName="page-item"
             nextLinkClassName="page-link"
             pageLinkClassName="page-link"
-            breakLabel={<Link to="" className="page-link">...</Link>}
+            breakLabel={
+              <Link to="" className="page-link">
+                ...
+              </Link>
+            }
             breakClassName="page-item"
             pageClassName="page-item"
             pageCount={pageCount}

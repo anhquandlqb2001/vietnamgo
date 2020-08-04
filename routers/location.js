@@ -23,7 +23,7 @@ router.post('/add', upload.single('profile'), (req, res) => {
   })
 
   const newLocation = location.save()
-  res.json('Location added')
+  res.json({ message: 'Location added', status: true })
 })
 
 router.get('/', (req, res) => {
