@@ -136,9 +136,11 @@ export default class NewTopic extends Component {
 
     axios
       .post("/api/topics/add", formData, config)
-      .then((res) => alert(res.data));
+      .then((res) => {
+        alert(res.data)
+        window.location = "/topics";
+      });
 
-    // window.location = "/topics";
   }
 
   render() {
