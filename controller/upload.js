@@ -1,7 +1,6 @@
 const upload = require("../middleware/upload")
 const Topic = require('../models/topic.models')
-const fs = require('fs')
-const path = require('path')
+
 const uploadFiles = async (req, res) => {
   try {
     await upload(req, res);

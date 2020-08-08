@@ -6,7 +6,6 @@ const uploadController = require("../controller/upload.js");
 const updateController = require("../controller/update.js");
 const Location = require("../models/location.models");
 const fs = require("fs");
-const { EDESTADDRREQ } = require("constants");
 
 router.get("/", (req, res) => {
   const sortOption =
