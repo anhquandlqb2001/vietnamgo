@@ -93,7 +93,7 @@ function Topic(props) {
         params: { action: "getComment" },
       })
       .then((response) => {
-        console.log(response.data)
+        console.log(response.data);
         if (!response.data.status) {
         } else {
           let result = response.data.topic;
@@ -127,9 +127,9 @@ function Topic(props) {
       <img
         data-toggle="modal"
         data-target="#exampleModal"
-        src={`/${img.filename}`}
-        value={img.filename}
-        onClick={() => zoomImg(`/${img.filename}`)}
+        src={img.url}
+        value={img.url}
+        onClick={() => zoomImg(img.url)}
         className="card-img mb-md-2"
         id="img-item"
         style={{ marginBottom: margin }}
@@ -148,7 +148,7 @@ function Topic(props) {
         <div
           className="img-thumbnail"
           style={{
-            backgroundImage: `url(/${topic.imageURL[0].filename})`,
+            backgroundImage: `url(${topic.imageURL[0].url})`,
           }}
         ></div>
       );

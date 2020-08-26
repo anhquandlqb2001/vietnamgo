@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Component } from "react";
+import React, { useEffect, useState } from "react";
 import { Slide } from "react-slideshow-image";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -12,17 +12,17 @@ const properties = {
   pauseOnHover: true,
 };
 
-const SlideshowSlide = (props) => {
+const SlideshowSlide = ({imgURL, _id, topicTitle}) => {
   return (
     <div className="slide-container">
       <Slide {...properties}>
-        {props.topicImgURL.map((img, index) => {
+        {imgURL.map((img, index) => {
           return (
-            <Link to={`/topics/${props.topicURL}`} key={index}>
+            <Link to={`/topics/${_id}`} key={index}>
               <div className="each-slide">
                 <div
                   style={{
-                    backgroundImage: `url(/${img.filename})`,
+                    backgroundImage: `url(${img.url})`,
                   }}
                 >
                   <div
@@ -33,7 +33,7 @@ const SlideshowSlide = (props) => {
                       backgroundColor: "rgba(0, 0, 0, 0.8)",
                     }}
                   >
-                    <span style={{}}>{props.topicTitle}</span>
+                    <span style={{}}>{topicTitle}</span>
                   </div>
                 </div>
               </div>
@@ -45,87 +45,46 @@ const SlideshowSlide = (props) => {
   );
 };
 
-export default class FavouriteTopics extends Component {
-  constructor(prop) {
-    super(prop);
-    this.state = {
-      topic1ImgURL: [],
-      topic2ImgURL: [],
-      topic3ImgURL: [],
-      topic1Title: "",
-      topic2Title: "",
-      topic3Title: "",
-      topic1URL: "",
-      topic2URL: "",
-      topic3URL: "",
-      windowWidth: 1000,
-      windowHeight: 1000,
-      visibility: "block",
-    };
+const FavouriteTopics = () => {
 
-    this.updateDimensions = this.updateDimensions.bind(this);
-  }
+  const [Data, setData] = useState([])
 
-  componentDidMount() {
+  useEffect(() => {
     axios.get("/api/topics/favourite").then((res) => {
-      this.setState({
-        topic1ImgURL: res.data.topics[0]!==undefined ? res.data.topics[0].imageURL : [],
-        topic2ImgURL: res.data.topics[1]!==undefined ? res.data.topics[1].imageURL : [],
-        topic3ImgURL: res.data.topics[2]!==undefined ? res.data.topics[2].imageURL : [],
-        topic1Title: res.data.topics[0]!==undefined ? res.data.topics[0].title : '',
-        topic2Title: res.data.topics[1]!==undefined ? res.data.topics[1].title : '',
-        topic3Title: res.data.topics[2]!==undefined ? res.data.topics[2].title : '',
-        topic1URL: res.data.topics[0]!==undefined ? res.data.topics[0]._id : '',
-        topic2URL: res.data.topics[1]!==undefined ? res.data.topics[1]._id : '',
-        topic3URL: res.data.topics[2]!==undefined ? res.data.topics[2]._id : '',
-      });
+      setData(res.data && res.data.topics)
     });
 
-    this.updateDimensions();
-    window.addEventListener("resize", this.updateDimensions);
-  }
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+  }, []);
 
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateDimensions);
-  }
+  useEffect(() => {
+    window.removeEventListener("resize", updateDimensions);
+  }, [window.innerWidth]);
 
-  updateDimensions() {
-    let windowWidth = typeof window !== "undefined" ? window.innerWidth : 0;
-    let windowHeight = typeof window !== "undefined" ? window.innerHeight : 0;
+  const updateDimensions = () => {
+    // let windowWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+    // let windowHeight = typeof window !== "undefined" ? window.innerHeight : 0;
 
-    this.setState({ windowWidth, windowHeight });
-    if (this.state.windowWidth < 768) {
-      this.setState({ visibility: "none" });
-    } else {
-      this.setState({ visibility: "block" });
-    }
-  }
+    // this.setState({ windowWidth, windowHeight });
+    // if (this.state.windowWidth < 768) {
+    //   this.setState({ visibility: "none" });
+    // } else {
+    //   this.setState({ visibility: "block" });
+    // }
+  };
 
-  render() {
-    return (
-      <div className="row">
-        <div className="col-md-4">
-          <SlideshowSlide
-            topicTitle={this.state.topic1Title}
-            topicURL={this.state.topic1URL}
-            topicImgURL={this.state.topic1ImgURL}
-          />
-        </div>
-        <div className="col-md-4">
-          <SlideshowSlide
-            topicTitle={this.state.topic2Title}
-            topicURL={this.state.topic2URL}
-            topicImgURL={this.state.topic2ImgURL}
-          />
-        </div>
-        <div className="col-md-4" style={{ display: this.state.visibility }}>
-          <SlideshowSlide
-            topicTitle={this.state.topic3Title}
-            topicURL={this.state.topic3URL}
-            topicImgURL={this.state.topic3ImgURL}
-          />
-        </div>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="row">
+      {Data.map((topic, index) => {
+        return (
+          <div className="col-md-4" key={index}>
+            <SlideshowSlide imgURL={topic.imageURL} topicTitle={topic.title} _id={topic._id} />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default FavouriteTopics;

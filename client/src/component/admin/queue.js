@@ -10,13 +10,12 @@ import auth from "../../js/auth";
 // mapboxgl.accessToken =
 //   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
 
-function Queue() {
+const Queue = () =>  {
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
   const [perPage, setperPage] = useState(10);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [coor, setCoor] = useState([108.2772, 14.0583]);
   const [windowWidth, setWindowWidth] = useState(0);
   const [currentStyle, setCurrentStyle] = useState(null);
   // const [map, setMap] = useState(null);
@@ -90,7 +89,7 @@ function Queue() {
           <div className="col-md-4 col-4">
             <Link to={`/topics/${topic._id}`}>
               <img
-                src={`/${topic.imageURL[0].filename}`}
+                src={`${topic.imageURL[0].url}`}
                 alt="img"
                 className="card-img"
                 style={currentStyle}

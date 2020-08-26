@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-function ChangeBackground() {
-  const [imgBgr, setImgBgr] = useState([]);
+const ChangeBackground = () => {
+  const [Data, setData] = useState([]);
 
-  const SlideItem = (props) => {
+  const SlidePreview = (props) => {
     if (props.index == 0) {
       return (
         <div className="carousel-item active">
@@ -29,19 +29,20 @@ function ChangeBackground() {
     );
   };
 
-  const bgrSlide = [...imgBgr].map((element, index) => {
-    return <SlideItem img={URL.createObjectURL(element)} index={index} key={index} />;
+  const Preview = [...Data].map((element, index) => {
+    return (
+      <SlidePreview
+        img={URL.createObjectURL(element)}
+        index={index}
+        key={index}
+      />
+    );
   });
-
-
-  const onChangeImage = (e) => {
-    setImgBgr(e.target.files);
-  };
 
   const onSaveSlideImage = () => {
     const fd = new FormData();
-    for (let index = 0; index < imgBgr.length; index++) {
-      const element = imgBgr[index];
+    for (let index = 0; index < Data.length; index++) {
+      const element = Data[index];
       fd.append("slide-img", element);
     }
 
@@ -57,22 +58,26 @@ function ChangeBackground() {
       }
       setTimeout(() => {
         window.location = "/";
-      }, 2000);
+      }, 700);
     });
   };
   return (
     <div className="container">
       <div className="form-group">
-        <label>Thay background</label>
+        <label for="slide-img">Thay background</label>
         <input
           type="file"
           name="slide-img"
           className="form-control-file btn btn-danger"
           id="slide-img"
-          onChange={(event) => onChangeImage(event)}
+          onChange={(event) => setData(event.target.files)}
           multiple
         />
-        <button className="btn btn-success mt-2" type="submit" onClick={onSaveSlideImage}>
+        <button
+          className="btn btn-success mt-2"
+          type="submit"
+          onClick={onSaveSlideImage}
+        >
           Lưu
         </button>
       </div>
@@ -82,7 +87,7 @@ function ChangeBackground() {
           className="carousel slide carousel-fade"
           data-ride="carousel"
         >
-          <div className="carousel-inner">{bgrSlide}</div>
+          <div className="carousel-inner">{Preview}</div>
           <a
             className="carousel-control-prev"
             href="#carouselExampleFade"
@@ -93,7 +98,7 @@ function ChangeBackground() {
               className="carousel-control-prev-icon"
               aria-hidden="true"
             ></span>
-            <span className="sr-only">Previous</span>
+            <span className="sr-only">Truoc</span>
           </a>
           <a
             className="carousel-control-next"
@@ -105,12 +110,12 @@ function ChangeBackground() {
               className="carousel-control-next-icon"
               aria-hidden="true"
             ></span>
-            <span className="sr-only">Next</span>
+            <span className="sr-only">Sau</span>
           </a>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default ChangeBackground;

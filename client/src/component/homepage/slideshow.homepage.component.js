@@ -1,49 +1,31 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import "./style.homepage.css";
 import axios from "axios";
 
-const SlideItem = (props) => {
-  if (props.index == 0) {
+const SlideItem = ({img, index}) => {
+  if (index == 0) {
     return (
       <div className="carousel-item active">
-        <img loading="lazy" src={props.img.filename} className="d-block w-100" alt="..." />
+        <img src={img.url} className="d-block w-100" alt="anh" />
       </div>
     );
   }
   return (
     <div className="carousel-item">
-      <img loading="lazy" src={props.img.filename} className="d-block w-100" alt="..." />
+      <img loading="lazy" src={img.url} className="d-block w-100" alt="anh" />
     </div>
   );
 };
 
-export default class SlideShow extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      image: [],
-    };
-  }
+const SlideShow = () => {
+  const [Image, setImage] = useState([])
 
-  componentDidMount() {
+  useEffect(() => {
     axios.get("/api/slideimg").then((res) => {
-      const result = res.data != '' ? res.data[0].img : "";
-      this.setState({
-        image: res.data,
-      });
-      try {
-        const SlideList = result.map((el, index) => {
-          return <SlideItem img={el} index={index} key={index}/>;
-        });
-
-        this.setState({
-          SlideList,
-        });
-      } catch (e) {}
+      setImage(res.data && res.data[0].img)
     });
-  }
+  }, [])
 
-  render() {
     return (
       <div className="carousel-container">
         <div
@@ -52,14 +34,9 @@ export default class SlideShow extends Component {
           data-ride="carousel"
         >
           <div className="carousel-inner">
-            {/* <div className="carousel-item active">
-              <img
-                src="https://images.unsplash.com/photo-1592961170215-dbb7b3e5ba04?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80"
-                className="d-block w-100"
-                alt="..."
-              />
-            </div> */}
-            {this.state.SlideList}
+            {Image.map((img, index) => {
+              return <SlideItem img={img} index={index} key={index}/>;
+            })}
           </div>
           <a
             className="carousel-control-prev"
@@ -88,5 +65,6 @@ export default class SlideShow extends Component {
         </div>
       </div>
     );
-  }
 }
+
+export default SlideShow

@@ -3,16 +3,14 @@ import { Link } from "react-router-dom";
 import UserProfile from "../../js/UserProfile";
 import "../style.css";
 import auth from "../../js/auth";
-export default class Navbar extends Component {
-  logout() {
+const Navbar = () => {
+  const Logout = () => {
     localStorage.clear();
     window.location.reload(true);
     auth.logout(() => {
       window.location = "/";
     });
-    // window.location = '/'
   }
-  render() {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <Link className="navbar-brand" to="/">
@@ -61,7 +59,7 @@ export default class Navbar extends Component {
               <div className="haslogin-container">
                 <button
                   className="nav-link btn btn-danger"
-                  onClick={this.logout}
+                  onClick={Logout}
                 >
                   Đăng xuất
                 </button>
@@ -81,5 +79,6 @@ export default class Navbar extends Component {
         </div>
       </nav>
     );
-  }
 }
+
+export default Navbar

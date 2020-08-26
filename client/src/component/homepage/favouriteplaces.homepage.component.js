@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
@@ -15,7 +15,7 @@ const SlideItem = (props) => (
       }}
     >
       <img
-        src={`/${props.item.image[0].filename}`}
+        src={`${props.item.image[0].url}`}
         alt="first-img"
         style={{
           visibility: props.style.visibility,
@@ -29,79 +29,63 @@ const SlideItem = (props) => (
   </div>
 );
 
-export default class FavourPlace extends Component {
-  constructor(props) {
-    super(props);
+const FavourPlace = () => {
+  const [Data, setData] = useState([]);
+  const [WindowWidth, setWindowWidth] = useState(0);
 
-    this.state = {
-      data: [],
-      windowWidth: 0,
-      windowHeight: 0,
-    };
-
-    this.updateDimensions = this.updateDimensions.bind(this);
-  }
-  componentDidMount() {
+  useEffect(() => {
     axios.get("/api/location/favourite").then((res) => {
-      this.setState({
-        data: res.data,
-      });
+      setData(res.data);
     });
 
-    this.updateDimensions();
-    window.addEventListener("resize", this.updateDimensions);
-  }
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+  }, []);
 
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateDimensions);
-  }
+  useEffect(() => {
+    window.removeEventListener("resize", updateDimensions);
+  }, [window.innerWidth]);
 
-  updateDimensions() {
+  const updateDimensions = () => {
     let windowWidth = typeof window !== "undefined" ? window.innerWidth : 0;
-    let windowHeight = typeof window !== "undefined" ? window.innerHeight : 0;
 
-    this.setState({ windowWidth, windowHeight });
-  }
+    setWindowWidth(windowWidth);
+  };
 
-  listSlide() {
-    try {
-      return this.state.data.map((item, index) => {
-        const Large = {
-          // ≥992px
-        };
-        const Medium = {
-          // ≥768px
-          height: "250px",
-        };
+  const listSlide = Data.map((item, index) => {
+    const Large = {
+      // ≥992px
+    };
+    const Medium = {
+      // ≥768px
+      height: "250px",
+    };
 
-        const Small = {
-          // ≥576px
-        };
+    const Small = {
+      // ≥576px
+    };
 
-        const ExtraSmall = {
-          index: 2,
-        };
+    const ExtraSmall = {
+      index: 2,
+    };
 
-        const styles =
-          this.state.windowWidth >= 992
-            ? Large
-            : this.state.windowWidth >= 768
-            ? Medium
-            : this.state.windowWidth >= 576
-            ? Small
-            : ExtraSmall;
+    const styles =
+      WindowWidth >= 992
+        ? Large
+        : WindowWidth >= 768
+        ? Medium
+        : WindowWidth >= 576
+        ? Small
+        : ExtraSmall;
+    return <SlideItem item={item} key={index} style={styles} />;
+  });
 
-        return <SlideItem item={item} key={index} style={styles} />;
-      });
-    } catch (error) {}
-  }
+  return (
+    <div className="text-center mt-4 my-3">
+      <h2>Điểm đến ưa thích</h2>
+      <div className="row">{listSlide}</div>
+    </div>
+  );
+};
 
-  render() {
-    return (
-      <div className="text-center mt-4 my-3">
-        <h2>Điểm đến ưa thích</h2>
-        <div className="row">{this.listSlide()}</div>
-      </div>
-    );
-  }
-}
+export default FavourPlace;

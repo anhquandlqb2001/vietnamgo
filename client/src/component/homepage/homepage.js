@@ -2,40 +2,24 @@ import SlideShow from "./slideshow.homepage.component";
 import FavourPlace from "./favouriteplaces.homepage.component";
 // import RandomPic from './homepage/randompic.homepage.component'
 import FavouriteTopics from "./favouritetopics.homepage.component";
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-export default class Home extends Component {
-  constructor(props) {
-    super(props);
+const Home = () => {
 
-    this.onChangeAddress = this.onChangeAddress.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-    this.state = {
-      search: "",
-      address: [],
-      files: [],
-    };
-  }
+  const [Search, setSearch] = useState('')
+  const [Address, setAddress] = useState([])
 
-  onChangeAddress = (event, values) => {
-    this.setState({
-      search: values,
-    });
-  };
-
-  componentDidMount() {
+  useEffect(() => {
     axios.get("/api/location").then((res) => {
-      this.setState({
-        address: res.data,
-      });
+      setAddress(res.data)
     });
-  }
+  }, [])
 
-  onSubmit(e) {
+  const onSubmit = (e) => {
     e.preventDefault();
     axios
       .get("/api/topics/search", {
@@ -44,26 +28,28 @@ export default class Home extends Component {
           Accept: "application/json; charset=utf-8",
         },
         params: {
-          address: this.state.search.address,
+          address: Address,
           page: 1,
         },
       })
       .then((res) => console.log(res.data));
   }
 
-  render() {
     return (
       <div>
         <div className="container my-2">
-          <form onSubmit={this.onSubmit}>
+          <form onSubmit={onSubmit}>
             <div className="form-group">
               <label>Bạn muốn đi đâu?</label>
               <Autocomplete
                 id="combo-box-demo"
-                options={this.state.address}
+                options={Address}
                 getOptionLabel={(option) => option.address}
                 style={{ width: 300 }}
-                onChange={this.onChangeAddress}
+                noOptionsText={'Chua co dia diem nao'}
+                onChange={(e, value) => {
+                  setSearch(value.address)
+                }}
                 renderInput={(params) => (
                   <TextField
                     name="address"
@@ -78,8 +64,8 @@ export default class Home extends Component {
             <Link
               to={{
                 pathname: `/topics/search`,
-                search: `address=${this.state.search.address}`,
-                state: { search: this.state.search.address },
+                search: `address=${Search}`,
+                state: { search: Search },
               }}
               type="submit"
               className="btn btn-primary"
@@ -98,5 +84,6 @@ export default class Home extends Component {
         </div>
       </div>
     );
-  }
 }
+
+export default Home

@@ -26,7 +26,6 @@ connection.once("open", () => {
 
 app.use(express.static(path.join(__dirname, "client", "build")));
 
-
 app.use(express.static("public/uploads"));
 app.use(express.static("public/locationimg"));
 app.use(express.static("public/slideimg"));
@@ -38,9 +37,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/location", locationRouter);
 app.use("/api/user", userRouter);
 
-
 app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
 });
 
 app.listen(port, "0.0.0.0", () => {

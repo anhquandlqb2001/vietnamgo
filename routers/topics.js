@@ -2,10 +2,12 @@ const express = require("express");
 const User = require("../models/user.models");
 const Topic = require("../models/topic.models");
 const router = express.Router();
-const uploadController = require("../controller/upload.js");
-const updateController = require("../controller/update.js");
 const Location = require("../models/location.models");
-const fs = require("fs");
+
+const cloudinary = require("cloudinary").v2.api;
+const upload = require("../config/modelMulter");
+
+const self = require("../config/multerconfig");
 
 router.get("/", (req, res) => {
   const sortOption =
@@ -183,15 +185,39 @@ router.get("/search", async (req, res) => {
   );
 });
 
-router.post("/add", uploadController.uploadFiles);
+router.post(
+  "/add",
+  upload.array("imgUpload"),
+  self.uploadMultipleFiles,
+  async (req, res) => {
+    const newTopic = new Topic({
+      title: req.body.title,
+      address_pri: req.body.address_pri,
+      address_sec: req.body.address_sec,
+      description: req.body.description,
+      body: req.body.body,
+      imageURL: req.imageArray,
+      coor: [req.body.coorx, req.body.coory],
+      watched: req.body.watched,
+      userID: req.body.id,
+      comments: [],
+    });
+
+    const topic = await newTopic.save();
+    res.json("Topic added");
+  }
+);
 
 router.get("/userpublished", async (req, res) => {
   let _id = req.query.id;
 
-  let topics = await Topic.find({ userID: _id, status: "published" }, (e, result) => {
-    res.json({ status: true, result })
-  })
-})
+  let topics = await Topic.find(
+    { userID: _id, status: "published" },
+    (e, result) => {
+      res.json({ status: true, result });
+    }
+  );
+});
 
 router.get("/:id", async (req, res) => {
   let _id = req.query.id;
@@ -285,16 +311,17 @@ router.delete("/:id", checkPermission, async (req, res) => {
   let topic;
   try {
     topic = await Topic.findById(req.params.id);
-    for (let index = 0; index < topic.imageURL.length; index++) {
-      const path = topic.imageURL[index].filename;
-      fs.unlink(`public/uploads/${path}`, (e) => {
-        if (e) {
-          throw e;
-        }
-      });
-    }
-    await topic.remove();
-    res.json(`Deleted ${req.params.id}`);
+    cloudinary.delete_resources(
+      topic.imageURL.map((img) => {
+        return img.id;
+      }),
+      (error, result) => {
+        console.log(result);
+      }
+    );
+
+    // await topic.remove();
+    // res.json(`Deleted ${req.params.id}`);
   } catch (e) {
     console.log(e);
   }
@@ -327,6 +354,19 @@ router.post("/accept/:id", async (req, res) => {
   await topic.save();
 });
 
-router.post("/update/:id", updateController.updateFiles);
+router.post("/update/:id", upload.array("imgUpload"), self.uploadMultipleFiles, async (req, res) => {
+  let topic = await Topic.findById(req.params.id)
+    topic.title = req.body.title
+    topic.address_pri = req.body.address_pri
+    topic.address_sec = req.body.address_sec
+    topic.coor = [req.body.coorx, req.body.coory]
+    topic.description = req.body.description
+    topic.body = req.body.body
+    topic.imageURL = req.imageArray
+
+    await topic.save()
+    console.log("update ok")
+    return res.json('Topic updated !')
+});
 
 module.exports = router;

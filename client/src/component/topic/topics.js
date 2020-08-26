@@ -10,7 +10,7 @@ import "../style.css";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
 
-function Topics(props) {
+const Topics = (props) => {
   const history = useHistory();
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
@@ -102,6 +102,7 @@ function Topics(props) {
   };
 
   const postData = Topics.map((topic, index) => {
+    console.log(topic)
     return (
       <div
         className="card mb-3 card-child-container overflow-hidden"
@@ -112,7 +113,7 @@ function Topics(props) {
           <div className="col-md-4 col-4">
             <Link to={`/topics/${topic._id}`}>
               <img
-                src={`/${topic.imageURL[0].filename}`}
+                src={topic.imageURL[0].url}
                 alt="img"
                 className="card-img"
                 style={currentStyle}

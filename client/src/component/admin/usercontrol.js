@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import auth from "../../js/auth";
 
-function UserControl() {
+const UserControl = () => {
   const [users, setUsers] = useState([]);
   const [windowWidth, setWindowWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(null);

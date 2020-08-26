@@ -1,48 +1,19 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import axios from "axios";
 import UserProfile from '../../js/UserProfile'
 import auth from '../../js/auth'
 
-export default class Signup extends Component {
-  constructor(props) {
-    super(props);
+const Signup = () => {
+  const [Email, setEmail] = useState('')
+  const [Username, setUsername] = useState('')
+  const [Password, setPassword] = useState('')
 
-    this.onChangeEmail = this.onChangeEmail.bind(this);
-    this.onChangeUsername = this.onChangeUsername.bind(this);
-    this.onChangePassword = this.onChangePassword.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-
-    this.state = {
-      email: "",
-      username: "",
-      password: "",
-    };
-  }
-
-  onChangeEmail(e) {
-    this.setState({
-      email: e.target.value,
-    });
-  }
-
-  onChangePassword(e) {
-    this.setState({
-      password: e.target.value,
-    });
-  }
-
-  onChangeUsername(e) {
-    this.setState({
-      username: e.target.value,
-    });
-  }
-
-  onSubmit(e) {
+  const onSubmit = (e) => {
     e.preventDefault();
     const data = {
-      email: this.state.email,
-      password: this.state.password,
-      username: this.state.username,
+      email: Email,
+      password: Password,
+      username: Username,
     };
 
     axios.post("/api/auth/register", data).then((res) => {
@@ -60,14 +31,13 @@ export default class Signup extends Component {
     });
   }
 
-  render() {
     return (
       <div className="container w-50">
-        <form onSubmit={this.onSubmit}>
+        <form onSubmit={onSubmit}>
           <div className="form-group">
             <label for="exampleInputEmail1">Email</label>
             <input
-              onChange={this.onChangeEmail}
+              onChange={e => setEmail(e.target.value)}
               type="email"
               className="form-control"
               id="exampleInputEmail1"
@@ -77,7 +47,7 @@ export default class Signup extends Component {
           <div className="form-group">
             <label for="exampleInputEmail1">Username</label>
             <input
-              onChange={this.onChangeUsername}
+              onChange={e => setUsername(e.target.value)}
               type="text"
               className="form-control"
             />
@@ -85,7 +55,7 @@ export default class Signup extends Component {
           <div className="form-group">
             <label for="exampleInputPassword1">Mật khẩu</label>
             <input
-              onChange={this.onChangePassword}
+              onChange={e => setPassword(e.target.value)}
               type="password"
               className="form-control"
               id="exampleInputPassword1"
@@ -97,5 +67,6 @@ export default class Signup extends Component {
         </form>
       </div>
     );
-  }
 }
+
+export default Signup

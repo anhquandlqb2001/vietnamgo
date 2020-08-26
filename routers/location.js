@@ -1,29 +1,18 @@
 const express = require('express');
 const router = express.Router()
 const Location = require('../models/location.models')
-var multer = require('multer');
-const path = require('path')
-const uploadPath = path.join('public', 'locationimg')
 
-var storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, uploadPath);
-     },
-    filename: function (req, file, cb) {
-        cb(null , file.fieldname + '-' + Date.now() + '.' + file.mimetype.split('/')[1]);
-    }
-});
+const upload = require("../config/modelMulter");
+const self = require("../config/multerconfig");
 
-var upload = multer({ storage: storage});
-
-router.post('/add', upload.single('profile'), (req, res) => {
-  const location = new Location({
+router.post('/add', upload.single('profile'), self.uploadSingleFile, async (req, res) => {
+  const newLocation = new Location({
     address: req.body.address,
-    image: req.file
+    image: req.imageDetails
   })
+  await newLocation.save()
 
-  const newLocation = location.save()
-  res.json({ message: 'Location added', status: true })
+  res.json({success: true})
 })
 
 router.get('/', (req, res) => {

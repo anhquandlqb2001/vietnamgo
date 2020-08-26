@@ -6,11 +6,10 @@ import UserProfile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
 import "../style.css";
-import qs from 'query-string'
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
 
-function Topics(props) {
+const Topics = (props) => {
   const history = useHistory();
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
@@ -124,7 +123,7 @@ function Topics(props) {
           <div className="col-md-4 col-4">
             <Link to={`/topics/${topic._id}`}>
               <img
-                src={`/${topic.imageURL[0].filename}`}
+                src={`${topic.imageURL[0].url}`}
                 alt="img"
                 className="card-img"
                 style={currentStyle}
