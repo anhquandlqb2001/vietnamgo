@@ -1,16 +1,14 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import data from "../../js/tinh-tp.json";
 import axios from "axios";
-import "./topic.css";
 import UserProfile from "../../js/UserProfile";
 const items = [];
-var img;
 
 for (const key in data) {
   items.push(data[key].name);
 }
 
-const EditTopic = (props) => {
+const NewTopic = () => {
   const [Title, setTitle] = useState("");
   const [Description, setDescription] = useState("");
   const [Body, setBody] = useState("");
@@ -19,45 +17,8 @@ const EditTopic = (props) => {
   const [Address, setAddress] = useState([]);
   const [Coor, setCoor] = useState([0, 0]);
   const [File, setFile] = useState([]);
-  const [OldImg, setOldImg] = useState([]);
-  const [UserID, setUserID] = useState("");
 
   useEffect(() => {
-    const getUserId = async () => {
-      await axios.get("/api/topics/" + props.match.params.id).then((res) => {
-        setUserID(res.data.topic.userID);
-      });
-    };
-    getUserId();
-
-    axios
-      .get("/api/topics/edit/" + props.match.params.id, {
-        params: {
-          role: UserProfile.getUserRole(),
-          userID: UserID,
-          userIDDelete: UserProfile.getUserId(),
-        },
-      })
-      .then((res) => {
-        if (!res.data.status) {
-          return props.history.push("/");
-        } else {
-          setTitle(res.data.title);
-          setDescription(res.data.description);
-          setBody(res.data.body);
-          setAddress_Pri(res.data.address_pri);
-          setAddress_Sec(res.data.address_sec);
-          setCoor(res.data.coor);
-          setOldImg(res.data.imageURL);
-        }
-
-        // var html = ''
-        // for (let index = 0; index < File.length; index++) {
-        //   html += `<img src="${File[index].url}" style="width: 200px; height: 200px" />`
-        // }
-        // document.getElementById("img-preview").innerHTML = html
-      });
-
     axios.get("/api/location").then((res) => {
       setAddress(res.data);
     });
@@ -71,6 +32,7 @@ const EditTopic = (props) => {
       const element = File[index];
       formData.append("imgUpload", element);
     }
+
     formData.append("title", Title);
     formData.append("description", Description);
     formData.append("body", Body);
@@ -79,6 +41,7 @@ const EditTopic = (props) => {
     formData.append("date", new Date());
     formData.append("coorx", Coor[0]);
     formData.append("coory", Coor[1]);
+    formData.append("id", UserProfile.getUserId());
 
     const config = {
       headers: {
@@ -86,12 +49,14 @@ const EditTopic = (props) => {
       },
     };
 
-    axios
-      .post("/api/topics/update/" + props.match.params.id, formData, config)
-      .then((res) => {
-        console.log(res.data);
-        window.location = "/topics/" + props.match.params.id;
-      });
+    axios.post("/api/topics/add", formData, config).then((res) => {
+      if (res.data.success) {
+        alert(res.data.message);
+        return (window.location = "/topics");
+      } else {
+        alert("Them bai viet that bai");
+      }
+    });
   };
 
   return (
@@ -157,6 +122,8 @@ const EditTopic = (props) => {
               />
             </div>
           </div>
+        </div>
+        <div className="form-row">
           <div className="form-group col-md-3">
             <label>Toạ độ: Coor-x</label>
             <input
@@ -177,6 +144,22 @@ const EditTopic = (props) => {
               onChange={(e) => setCoor([Coor[0], e.target.value])}
             />
           </div>
+          <div className="form-group col-md-6">
+            <label for="">Duong dan ban do</label>
+            <input
+              type="text"
+              className="form-control"
+              onChange={(e) => {
+                if (e.target.value.split('@')[1]) {
+                  if (e.target.value.split('@')[1].split(',')[0] && e.target.value.split('@')[1].split(',')[1]) {
+                    setCoor([e.target.value.split('@')[1].split(',')[0], e.target.value.split('@')[1].split(',')[1]])
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
+        <div className="form-row">
           <div className="form-group">
             <label>Chọn ảnh</label>
             <input
@@ -188,30 +171,21 @@ const EditTopic = (props) => {
               multiple
             />
             <div className="img-preview" id="img-preview">
-              {!File
-                ? OldImg.map((img, index) => {
-                    return (
-                      <img
-                        src={img.url}
-                        key={index}
-                        style={{ width: "200px", height: "200px" }}
-                      />
-                    );
-                  })
-                : [...File].map((file, index) => {
-                    return (
-                      <img
-                        src={URL.createObjectURL(file)}
-                        key={index}
-                        style={{ width: "200px", height: "200px" }}
-                      />
-                    );
-                  })}
+              {File &&
+                [...File].map((file, index) => {
+                  return (
+                    <img
+                      src={URL.createObjectURL(file)}
+                      key={index}
+                      style={{ width: "200px", height: "200px" }}
+                    />
+                  );
+                })}
             </div>
           </div>
         </div>
         <button type="submit" className="btn btn-primary px-4">
-          Lưu
+          Tạo
         </button>
         <a href="/" type="submit" className="btn btn-danger ml-3">
           Thoát
@@ -221,4 +195,4 @@ const EditTopic = (props) => {
   );
 };
 
-export default EditTopic;
+export default NewTopic;

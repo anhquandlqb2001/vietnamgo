@@ -17,8 +17,6 @@ mongoose.connect(process.env.DATABASE_URL, {
   useUnifiedTopology: true,
 });
 
-// console.log(process.env.PORT)
-
 const connection = mongoose.connection;
 connection.once("open", () => {
   console.log("Connected to database");

@@ -328,7 +328,7 @@ router.delete("/:id", checkPermission, async (req, res) => {
     await topic.remove();
     res.json({ success: true, message: `Deleted ${req.params.id}` });
   } catch (e) {
-    res.json({success: false, e})
+    res.json({ success: false, e });
   }
 });
 
@@ -366,18 +366,20 @@ router.post(
   async (req, res) => {
     try {
       let topic = await Topic.findById(req.params.id);
-      removeImageOnCloud(
-        topic.imageURL.map((img) => {
-          return img.id;
-        })
-      );
       topic.title = req.body.title;
       topic.address_pri = req.body.address_pri;
       topic.address_sec = req.body.address_sec;
       topic.coor = [req.body.coorx, req.body.coory];
       topic.description = req.body.description;
       topic.body = req.body.body;
-      topic.imageURL = req.imageArray;
+      if (req.imageArray.length > 0) {
+        removeImageOnCloud(
+          topic.imageURL.map((img) => {
+            return img.id;
+          })
+        );
+        topic.imageURL = req.imageArray;
+      }
 
       await topic.save();
       return res.json({ success: true, message: "Cap nhat thanh cong" });

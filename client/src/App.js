@@ -5,27 +5,27 @@ import {
   Switch,
   BrowserRouter,
 } from "react-router-dom";
-import Navbar from "./component/navbar/navbar";
-import Home from "./component/homepage/homepage";
-import Topics from "./component/topic/topics";
-import NewTopic from "./component/topic/newtopic";
-import Topic from "./component/topic/topic";
-import Search from "./component/topic/searchResult";
-import EditTopic from "./component/topic/edittopic";
-import NewLocation from "./component/location/newlocation";
-import Login from "./component/auth/login";
-import Signup from "./component/auth/signup";
+import Navbar from "./page/navbar/navbar";
+import Home from "./page/homepage/homepage";
+import Topics from "./page/topic/topics";
+import NewTopic from "./page/topic/newtopic";
+import Topic from "./page/topic/topic";
+import Search from "./page/topic/searchResult";
+import EditTopic from "./page/topic/edittopic";
+import NewLocation from "./page/location/newlocation";
+import Login from "./page/auth/login";
+import Signup from "./page/auth/signup";
 import {
   ProtectedRoute,
   ProtectedRouteAuth,
   RouteAdminPermission,
 } from "./js/protected.route";
-import Queue from "./component/admin/queue";
-import UserControl from "./component/admin/usercontrol";
-import Control from "./component/admin/control";
-import User from "./component/user/control";
-import ChangeBackround from "./component/admin/changebackground";
-import TopicPublished from "./component/user/topicpublished";
+import Queue from "./page/admin/queue";
+import UserControl from "./page/admin/usercontrol";
+import Control from "./page/admin/control";
+import User from "./page/user/control";
+import ChangeBackround from "./page/admin/changebackground";
+import TopicPublished from "./page/user/topicpublished";
 
 function App() {
   return (
