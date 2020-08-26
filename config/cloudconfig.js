@@ -11,7 +11,7 @@ const self = (module.exports = {
     return new Promise((resolve) => {
       cloudinary.uploader
         .upload(file, {
-          folder: "single",
+          folder: "others",
         })
         .then((result) => {
           resolve({
@@ -25,7 +25,7 @@ const self = (module.exports = {
     return new Promise((resolve) => {
       cloudinary.uploader
         .upload(file, {
-          folder: "home",
+          folder: "topics",
         })
         .then((result) => {
           if (result) {

@@ -19,9 +19,11 @@ const [Image, setImage] = useState(null)
 
     axios.post('/api/location/add', fd)
       .then(res => {
-        if (res.data.status) {
+        if (res.data.success) {
           alert(res.data.message)
-          window.location = '/'
+          return window.location = '/'
+        } else {
+          alert(res.data.message)
         }
       })
   }

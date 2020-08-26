@@ -16,7 +16,7 @@ const NewTopic = () => {
   const [Address_Sec, setAddress_Sec] = useState("");
   const [Address, setAddress] = useState([]);
   const [Coor, setCoor] = useState([0, 0]);
-  const [File, setFile] = useState(null);
+  const [File, setFile] = useState([]);
 
   useEffect(() => {
     axios.get("/api/location").then((res) => {
@@ -50,7 +50,12 @@ const NewTopic = () => {
     };
 
     axios.post("/api/topics/add", formData, config).then((res) => {
-      window.location = "/topics";
+      if (res.data.success) {
+        alert(res.data.message)
+        return window.location = "/topics";
+      } else {
+        alert("Them bai viet that bai")
+      }
     });
   };
 

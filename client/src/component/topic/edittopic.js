@@ -18,7 +18,7 @@ const EditTopic = (props) => {
   const [Address_Sec, setAddress_Sec] = useState("");
   const [Address, setAddress] = useState([]);
   const [Coor, setCoor] = useState([0, 0]);
-  const [File, setFile] = useState(null);
+  const [File, setFile] = useState([]);
   const [OldImg, setOldImg] = useState([]);
   const [UserID, setUserID] = useState("");
 

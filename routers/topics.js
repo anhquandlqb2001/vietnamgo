@@ -190,21 +190,25 @@ router.post(
   upload.array("imgUpload"),
   self.uploadMultipleFiles,
   async (req, res) => {
-    const newTopic = new Topic({
-      title: req.body.title,
-      address_pri: req.body.address_pri,
-      address_sec: req.body.address_sec,
-      description: req.body.description,
-      body: req.body.body,
-      imageURL: req.imageArray,
-      coor: [req.body.coorx, req.body.coory],
-      watched: req.body.watched,
-      userID: req.body.id,
-      comments: [],
-    });
+    try {
+      const newTopic = new Topic({
+        title: req.body.title,
+        address_pri: req.body.address_pri,
+        address_sec: req.body.address_sec,
+        description: req.body.description,
+        body: req.body.body,
+        imageURL: req.imageArray,
+        coor: [req.body.coorx, req.body.coory],
+        watched: req.body.watched,
+        userID: req.body.id,
+        comments: [],
+      });
 
-    const topic = await newTopic.save();
-    res.json("Topic added");
+      const topic = await newTopic.save();
+      return res.json({ success: true, message: "Them bai viet thanh cong" });
+    } catch (error) {
+      res.json({ success: false, error });
+    }
   }
 );
 
@@ -307,23 +311,24 @@ router.post("/:id", async (req, res) => {
   }
 });
 
+const removeImageOnCloud = (Public_Ids) => {
+  cloudinary.delete_resources(Public_Ids, (error, result) => {
+    console.log(result);
+  });
+};
+
 router.delete("/:id", checkPermission, async (req, res) => {
-  let topic;
   try {
-    topic = await Topic.findById(req.params.id);
-    cloudinary.delete_resources(
+    const topic = await Topic.findById(req.params.id);
+    removeImageOnCloud(
       topic.imageURL.map((img) => {
         return img.id;
-      }),
-      (error, result) => {
-        console.log(result);
-      }
+      })
     );
-
-    // await topic.remove();
-    // res.json(`Deleted ${req.params.id}`);
+    await topic.remove();
+    res.json({ success: true, message: `Deleted ${req.params.id}` });
   } catch (e) {
-    console.log(e);
+    res.json({success: false, e})
   }
 });
 
@@ -354,19 +359,32 @@ router.post("/accept/:id", async (req, res) => {
   await topic.save();
 });
 
-router.post("/update/:id", upload.array("imgUpload"), self.uploadMultipleFiles, async (req, res) => {
-  let topic = await Topic.findById(req.params.id)
-    topic.title = req.body.title
-    topic.address_pri = req.body.address_pri
-    topic.address_sec = req.body.address_sec
-    topic.coor = [req.body.coorx, req.body.coory]
-    topic.description = req.body.description
-    topic.body = req.body.body
-    topic.imageURL = req.imageArray
+router.post(
+  "/update/:id",
+  upload.array("imgUpload"),
+  self.uploadMultipleFiles,
+  async (req, res) => {
+    try {
+      let topic = await Topic.findById(req.params.id);
+      removeImageOnCloud(
+        topic.imageURL.map((img) => {
+          return img.id;
+        })
+      );
+      topic.title = req.body.title;
+      topic.address_pri = req.body.address_pri;
+      topic.address_sec = req.body.address_sec;
+      topic.coor = [req.body.coorx, req.body.coory];
+      topic.description = req.body.description;
+      topic.body = req.body.body;
+      topic.imageURL = req.imageArray;
 
-    await topic.save()
-    console.log("update ok")
-    return res.json('Topic updated !')
-});
+      await topic.save();
+      return res.json({ success: true, message: "Cap nhat thanh cong" });
+    } catch (error) {
+      res.json({ success: false, error });
+    }
+  }
+);
 
 module.exports = router;

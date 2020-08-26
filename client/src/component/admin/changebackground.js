@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const ChangeBackground = () => {
   const [Data, setData] = useState([]);
+  const [Progress, setProgress] = useState(false);
 
   const SlidePreview = (props) => {
     if (props.index == 0) {
@@ -55,10 +57,12 @@ const ChangeBackground = () => {
     axios.post("/api/slideimg", fd, config).then((res) => {
       if (res.data.status) {
         alert(res.data.message);
+        setTimeout(() => {
+          window.location = "/";
+        }, 700);
+      } else {
+        alert("Cap nhat background that bai");
       }
-      setTimeout(() => {
-        window.location = "/";
-      }, 700);
     });
   };
   return (
@@ -76,10 +80,22 @@ const ChangeBackground = () => {
         <button
           className="btn btn-success mt-2"
           type="submit"
-          onClick={onSaveSlideImage}
+          onClick={() => {
+            onSaveSlideImage()
+            setProgress(!Progress)
+          }}
         >
           Lưu
         </button>
+        {Progress ? (
+          <>
+            <div>
+              <CircularProgress />
+            </div>
+          </>
+        ) : (
+          ""
+        )}
       </div>
       <div className="carousel-container">
         <div

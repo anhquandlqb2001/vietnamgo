@@ -22,7 +22,10 @@ const SlideShow = () => {
 
   useEffect(() => {
     axios.get("/api/slideimg").then((res) => {
-      setImage(res.data && res.data[0].img)
+      console.log(res.data)
+      if (res.data.success && res.data.length !== 0) {
+        setImage(res.data.result[0].img)
+      }
     });
   }, [])
 
