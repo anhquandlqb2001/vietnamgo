@@ -1,5 +1,4 @@
-const cloudinary = require("./cloudconfig");
-const Topic = require("../models/topic.models");
+const cloudinary = require("../config/cloudConfig");
 const self = (module.exports = {
   uploadSingleFile: async (req, res, next) => {
     cloudinary.uploadSingle(req.file.path).then((result) => {
