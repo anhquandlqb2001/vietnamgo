@@ -145,7 +145,7 @@ const NewTopic = () => {
             />
           </div>
           <div className="form-group col-md-6">
-            <label for="">Duong dan ban do</label>
+            <label htmlFor="">Duong dan ban do</label>
             <input
               type="text"
               className="form-control"

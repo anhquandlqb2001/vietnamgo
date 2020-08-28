@@ -12,6 +12,7 @@ mapboxgl.accessToken =
 
 const Topics = (props) => {
   const history = useHistory();
+  const [Data, setData] = useState([]);
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
   const [perPage, setperPage] = useState(10);
@@ -25,6 +26,7 @@ const Topics = (props) => {
     history.location.search.split("=")[1]
   );
   const [sortTitle, setSortTitle] = useState("Theo ngày đăng");
+
   const mapContainer = useRef(null);
 
   useEffect(() => {
@@ -44,8 +46,53 @@ const Topics = (props) => {
     if (!map) initializeMap({ setMap, mapContainer });
   }, [map]);
 
+  const updateDimensions = () => {
+    let width = typeof window !== "undefined" ? window.innerWidth : 0;
+    setWindowWidth(width);
+    if (windowWidth < 576) {
+      setCurrentStyle(styleMobile);
+    } else {
+      setCurrentStyle(null);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+  }, []);
+
   useEffect(() => {
     getTopics();
+  }, [currentPage]);
+
+  useEffect(() => {
+    switch (sortOption) {
+      case "date":
+        setTopics(
+          Topics.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          })
+        );
+        break;
+      case "watch":
+        setTopics(
+          Topics.sort((a, b) => {
+            return b.watched - a.watched;
+          })
+        );
+        break;
+      case "like":
+        setTopics(
+          Topics.sort((a, b) => {
+            return b.like.length - a.like.length;
+          })
+        );
+        break;
+      default:
+        break;
+    }
+
     if (sortOption) {
       history.push({
         pathname: `/topics`,
@@ -65,29 +112,24 @@ const Topics = (props) => {
         document.getElementById(item.id).classList.remove("active");
       }
     });
-  }, [currentPage, sortOption]);
+  }, [sortOption]);
 
-  const updateDimensions = () => {
-    let width = typeof window !== "undefined" ? window.innerWidth : 0;
-    setWindowWidth(width);
-    if (windowWidth < 576) {
-      setCurrentStyle(styleMobile);
-    } else {
-      setCurrentStyle(null);
-    }
+  const getData = () => {
+    axios.get(`/api/topics`).then((res) => {
+      if (res.data.success) {
+        const data = res.data.result;
+        setData(data);
+        const slice = data.slice(offset, offset + perPage);
+        setTopics(slice);
+        setPageCount(Math.ceil(data.length / perPage));
+      }
+    });
   };
 
-  useEffect(() => {
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-  }, [windowWidth]);
   const getTopics = () => {
-    axios.get(`/api/topics?sortby=${sortOption}`).then((res) => {
-      const data = res.data.tops;
-      const slice = data.slice(offset, offset + perPage);
-      setTopics(slice);
-      setPageCount(Math.ceil(data.length / perPage));
-    });
+    const slice = Data.slice(offset, offset + perPage);
+    setTopics(slice);
+    setPageCount(Math.ceil(Data.length / perPage));
   };
 
   const handlePageClick = (e) => {
@@ -102,7 +144,6 @@ const Topics = (props) => {
   };
 
   const postData = Topics.map((topic, index) => {
-    console.log(topic)
     return (
       <div
         className="card mb-3 card-child-container overflow-hidden"
@@ -290,6 +331,6 @@ const Topics = (props) => {
       </div>
     </div>
   );
-}
+};
 
 export default Topics;

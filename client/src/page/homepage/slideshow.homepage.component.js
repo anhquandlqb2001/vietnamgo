@@ -3,7 +3,7 @@ import "./style.homepage.css";
 import axios from "axios";
 
 const SlideItem = ({img, index}) => {
-  if (index == 0) {
+  if (index === 0) {
     return (
       <div className="carousel-item active">
         <img src={img.url} className="d-block w-100" alt="anh" />

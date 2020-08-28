@@ -1,6 +1,5 @@
 import SlideShow from "./slideshow.homepage.component";
 import FavourPlace from "./favouriteplaces.homepage.component";
-// import RandomPic from './homepage/randompic.homepage.component'
 import FavouriteTopics from "./favouritetopics.homepage.component";
 import React, { useState, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";

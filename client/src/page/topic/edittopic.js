@@ -1,10 +1,9 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import data from "../../js/tinh-tp.json";
 import axios from "axios";
 import "./topic.css";
 import UserProfile from "../../js/UserProfile";
 const items = [];
-var img;
 
 for (const key in data) {
   items.push(data[key].name);
@@ -50,12 +49,6 @@ const EditTopic = (props) => {
           setCoor(res.data.coor);
           setOldImg(res.data.imageURL);
         }
-
-        // var html = ''
-        // for (let index = 0; index < File.length; index++) {
-        //   html += `<img src="${File[index].url}" style="width: 200px; height: 200px" />`
-        // }
-        // document.getElementById("img-preview").innerHTML = html
       });
 
     axios.get("/api/location").then((res) => {
@@ -87,10 +80,13 @@ const EditTopic = (props) => {
     };
 
     axios
-      .post("/api/topics/update/" + props.match.params.id, formData, config)
+      .put("/api/topics/update/" + props.match.params.id, formData, config)
       .then((res) => {
-        console.log(res.data);
-        window.location = "/topics/" + props.match.params.id;
+        if (res.data.success) {
+          alert(res.data.message)
+          return window.location = "/topics/" + props.match.params.id;
+        }
+        return alert("Cap nhat that bai")
       });
   };
 
@@ -185,9 +181,15 @@ const EditTopic = (props) => {
               type="text"
               className="form-control"
               onChange={(e) => {
-                if (e.target.value.split('@')[1]) {
-                  if (e.target.value.split('@')[1].split(',')[0] && e.target.value.split('@')[1].split(',')[1]) {
-                    setCoor([e.target.value.split('@')[1].split(',')[0], e.target.value.split('@')[1].split(',')[1]])
+                if (e.target.value.split("@")[1]) {
+                  if (
+                    e.target.value.split("@")[1].split(",")[0] &&
+                    e.target.value.split("@")[1].split(",")[1]
+                  ) {
+                    setCoor([
+                      e.target.value.split("@")[1].split(",")[0],
+                      e.target.value.split("@")[1].split(",")[1],
+                    ]);
                   }
                 }
               }}
@@ -206,24 +208,25 @@ const EditTopic = (props) => {
               multiple
             />
             <div className="img-preview" id="img-preview">
-              {File.length !== 0 ?
-                [...File].map((file, index) => {
-                  return (
-                    <img
-                      src={URL.createObjectURL(file)}
-                      key={index}
-                      style={{ width: "200px", height: "200px" }}
-                    />
-                  );
-                }) : OldImg.map((img,index) => {
-                  return (
-                    <img
-                      src={img.url}
-                      key={index}
-                      style={{ width: "200px", height: "200px" }}
-                    />
-                  );
-                })}
+              {File.length !== 0
+                ? [...File].map((file, index) => {
+                    return (
+                      <img
+                        src={URL.createObjectURL(file)}
+                        key={index}
+                        style={{ width: "200px", height: "200px" }}
+                      />
+                    );
+                  })
+                : OldImg.map((img, index) => {
+                    return (
+                      <img
+                        src={img.url}
+                        key={index}
+                        style={{ width: "200px", height: "200px" }}
+                      />
+                    );
+                  })}
             </div>
           </div>
         </div>

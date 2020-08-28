@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Slide } from "react-slideshow-image";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { LazyImage } from "../../components/LazyImage";
 
 const properties = {
   duration: 4000,
@@ -12,7 +13,7 @@ const properties = {
   pauseOnHover: true,
 };
 
-const SlideshowSlide = ({imgURL, _id, topicTitle}) => {
+const SlideshowSlide = ({ imgURL, _id, topicTitle }) => {
   return (
     <div className="slide-container">
       <Slide {...properties}>
@@ -20,11 +21,7 @@ const SlideshowSlide = ({imgURL, _id, topicTitle}) => {
           return (
             <Link to={`/topics/${_id}`} key={index}>
               <div className="each-slide">
-                <div
-                  style={{
-                    backgroundImage: `url(${img.url})`,
-                  }}
-                >
+                <LazyImage src={img.url} styles={{height: "300px", backgroundSize: "cover"}}>
                   <div
                     style={{
                       display: "table",
@@ -35,7 +32,7 @@ const SlideshowSlide = ({imgURL, _id, topicTitle}) => {
                   >
                     <span style={{}}>{topicTitle}</span>
                   </div>
-                </div>
+                </LazyImage>
               </div>
             </Link>
           );
@@ -46,26 +43,21 @@ const SlideshowSlide = ({imgURL, _id, topicTitle}) => {
 };
 
 const FavouriteTopics = () => {
-
-  const [Data, setData] = useState([])
+  const [Data, setData] = useState([]);
 
   useEffect(() => {
     axios.get("/api/topics/favourite").then((res) => {
-      setData(res.data && res.data.topics)
+      console.log(res.data)
+      res.data.success && setData(res.data.result)
     });
 
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
   }, []);
 
-  useEffect(() => {
-    window.removeEventListener("resize", updateDimensions);
-  }, [window.innerWidth]);
-
   const updateDimensions = () => {
     // let windowWidth = typeof window !== "undefined" ? window.innerWidth : 0;
     // let windowHeight = typeof window !== "undefined" ? window.innerHeight : 0;
-
     // this.setState({ windowWidth, windowHeight });
     // if (this.state.windowWidth < 768) {
     //   this.setState({ visibility: "none" });
@@ -79,7 +71,11 @@ const FavouriteTopics = () => {
       {Data.map((topic, index) => {
         return (
           <div className="col-md-4" key={index}>
-            <SlideshowSlide imgURL={topic.imageURL} topicTitle={topic.title} _id={topic._id} />
+            <SlideshowSlide
+              imgURL={topic.imageURL}
+              topicTitle={topic.title}
+              _id={topic._id}
+            />
           </div>
         );
       })}

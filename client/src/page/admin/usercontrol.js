@@ -6,14 +6,11 @@ const UserControl = () => {
   const [users, setUsers] = useState([]);
   const [windowWidth, setWindowWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(null);
-  const [reload, setReload] = useState(true)
 
   useEffect(() => {
     getUserData();
-    setReload(false)
-    
-  }, [reload]);
-
+  }, []);
+  
   const getUserData = () => {
     axios.get("/api/user").then((res) => {
       setUsers(res.data);
@@ -38,7 +35,10 @@ const UserControl = () => {
   const userData = users.map((user, index) => {
     if (!isMobile) {
       return (
-        <li className="list-group-item d-flex justify-content-between" key={index}>
+        <li
+          className="list-group-item d-flex justify-content-between"
+          key={index}
+        >
           <div>
             <div className="d-flex">
               Tên tài khoản:<p className="text-primary ml-1">{user.username}</p>
@@ -101,16 +101,29 @@ const UserControl = () => {
   });
 
   const roleUp = (id) => {
-    setReload(true)
-    axios.get("/api/user/up", { params: { id: id } });
+    axios.get("/api/user/up", { params: { id: id } }).then((res) => {
+      console.log("aaa");
+      if (res.data.success) {
+        setUsers([
+          ...users.filter((user) => user._id !== id),
+          { ...users.find((user) => user._id === id), role: "creator" },
+        ]);
+      }
+    });
   };
 
   const roleDown = (id) => {
-    setReload(true)
-    axios.get("/api/user/down", { params: { id: id } });
+    axios.get("/api/user/down", { params: { id: id } }).then((res) => {
+      if (res.data.success) {
+        setUsers([
+          ...users.filter((user) => user._id !== id),
+          { ...users.find((user) => user._id === id), role: "customer" },
+        ]);
+      }
+    });
   };
-  
+
   return <ul className="list-group container">{userData}</ul>;
-}
+};
 
 export default UserControl;

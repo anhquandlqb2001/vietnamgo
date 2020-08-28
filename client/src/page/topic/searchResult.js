@@ -11,6 +11,7 @@ mapboxgl.accessToken =
 
 const Topics = (props) => {
   const history = useHistory();
+  const [Data, setData] = useState([]);
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
   const [perPage, setperPage] = useState(10);
@@ -20,14 +21,10 @@ const Topics = (props) => {
   const [map, setMap] = useState(null);
   const [windowWidth, setWindowWidth] = useState(0);
   const [currentStyle, setCurrentStyle] = useState(null);
-  const [sortOption, setSortOption] = useState(
-    // history.location.search.split("=")[1]'
-    'date'
-  );
-  const search = window.location.search.substring(1)
-  // console.log(search.split('&'))
-  const [searchAddress, setSearchAddress] = useState(search.split('&')[0])
-  const [sortTitle, setSortTitle] = useState('Theo ngày đăng')
+  const [sortOption, setSortOption] = useState(null);
+  const search = window.location.search.substring(1);
+  const [searchAddress, setSearchAddress] = useState(search.split("&")[0]);
+  const [sortTitle, setSortTitle] = useState("Bài viết mới");
   const mapContainer = useRef(null);
 
   useEffect(() => {
@@ -48,7 +45,18 @@ const Topics = (props) => {
   }, [map]);
 
   useEffect(() => {
+    getData();
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+  }, []);
+
+  useEffect(() => {
     getTopics();
+  }, [currentPage]);
+
+  useEffect(() => {
+    sortTopics(sortOption)
+    
     if (sortOption) {
       history.push({
         pathname: `/topics/search`,
@@ -57,26 +65,46 @@ const Topics = (props) => {
     }
 
     [
-      { id: "date", title: "Bài mới nhất" },
+      { id: "date", title: "Bài viết mới" },
       { id: "like", title: "Theo lượt thích" },
       { id: "watch", title: "Theo lượt xem" },
     ].map((item) => {
-      // (document.getElementById("sort-title").innerText = item.title))
-      // console
-        if (item.id === sortOption) {
-          document.getElementById(item.id).classList.add("active")
-          document.getElementById("sort-title").innerText = item.title
-        } else {
-          document.getElementById(item.id).classList.remove("active");
-        }
+      if (item.id === sortOption) {
+        document.getElementById(item.id).classList.add("active");
+        document.getElementById("sort-title").innerText = item.title;
+      } else {
+        document.getElementById(item.id).classList.remove("active");
+      }
     });
+  }, [sortOption]);
 
-  }, [currentPage, sortOption]);
-
-  useEffect(() => {
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-  }, [windowWidth]);
+  const sortTopics = sortOption => {
+    switch (sortOption) {
+      case "date":
+        setTopics(
+          Topics.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          })
+        );
+        break;
+      case "watch":
+        setTopics(
+          Topics.sort((a, b) => {
+            return b.watched - a.watched;
+          })
+        );
+        break;
+      case "like":
+        setTopics(
+          Topics.sort((a, b) => {
+            return b.like.length - a.like.length;
+          })
+        );
+        break;
+      default:
+        break;
+    }
+  }
 
   const updateDimensions = () => {
     let width = typeof window !== "undefined" ? window.innerWidth : 0;
@@ -88,18 +116,27 @@ const Topics = (props) => {
     }
   };
 
-  const getTopics = () => {
+  const getData = () => {
     axios
-      .get(
-          `/api/topics/search?${searchAddress}&sortby=${sortOption}`
-      )
+      .get(`/api/topics/search?${searchAddress}`)
       .then((res) => {
-        const data = res.data.tops;
-        const slice = data.slice(offset, offset + perPage);
-        setTopics(slice);
-        setPageCount(Math.ceil(data.length / perPage));
+        if (res.data.success) {
+          const data = res.data.result;
+          setData(data);
+          const slice = data.slice(offset, offset + perPage);
+          setTopics(slice);
+          setSortOption("date")
+          setPageCount(Math.ceil(data.length / perPage));
+        }
       });
   };
+
+  const getTopics = () => {
+    const slice = Data.slice(offset, offset + perPage);
+    setTopics(slice);
+    setPageCount(Math.ceil(Data.length / perPage));
+  };
+
 
   const handlePageClick = (e) => {
     const selectedPage = e.selected;
@@ -198,7 +235,7 @@ const Topics = (props) => {
         console.log(response.data);
       });
 
-    setTopics(Topics.filter((el) => el._id != id));
+    setTopics(Topics.filter((el) => el._id !== id));
   };
 
   const changeLocation = (coor, id) => {
@@ -226,19 +263,15 @@ const Topics = (props) => {
             aria-expanded="false"
             id="sort-title"
           >
-            Bài mới nhất
+            {sortTitle}
           </button>
           <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a
               className="dropdown-item"
               onClick={() => {
                 setSortOption("date");
-                setSortTitle('Theo ngày đăng')
+                setSortTitle("Bài viết mới");
               }}
-              // onMouseOver={(e) => {
-              //   e.target.classList.add('active')
-              //   onmouseout=((eve) => {eve.target.classList.remove('active')})
-              // }}
               id="date"
             >
               Bài viết mới
@@ -247,7 +280,7 @@ const Topics = (props) => {
               className="dropdown-item"
               onClick={() => {
                 setSortOption("watch");
-                setSortTitle('Theo lượt xem')
+                setSortTitle("Theo lượt xem");
               }}
               id="watch"
             >
@@ -257,7 +290,7 @@ const Topics = (props) => {
               className="dropdown-item"
               onClick={() => {
                 setSortOption("like");
-                setSortTitle('Theo lượt thích')
+                setSortTitle("Theo lượt thích");
               }}
               id="like"
             >
@@ -276,7 +309,11 @@ const Topics = (props) => {
             nextClassName="page-item"
             nextLinkClassName="page-link"
             pageLinkClassName="page-link"
-            breakLabel={<Link to="" className="page-link">...</Link>}
+            breakLabel={
+              <Link to="" className="page-link">
+                ...
+              </Link>
+            }
             breakClassName="page-item"
             pageClassName="page-item"
             pageCount={pageCount}
@@ -296,6 +333,6 @@ const Topics = (props) => {
       </div>
     </div>
   );
-}
+};
 
 export default Topics;

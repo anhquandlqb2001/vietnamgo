@@ -29,8 +29,6 @@ import TopicPublished from "./page/user/topicpublished";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div>
         <Router>
           <Navbar />
           <Switch>
@@ -110,8 +108,6 @@ function App() {
             <Route path="*" component={() => "Không tìm thấy trang"} />
           </Switch>
         </Router>
-      </div>
-    </BrowserRouter>
   );
 }
 

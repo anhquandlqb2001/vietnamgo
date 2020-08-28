@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import UserProfile from "../../js/UserProfile";
 import auth from "../../js/auth";
@@ -34,7 +34,7 @@ const Login = () => {
       <div className="container w-50">
         <form onSubmit={onSubmit}>
           <div className="form-group">
-            <label for="exampleInputEmail1">Email</label>
+            <label htmlFor="exampleInputEmail1">Email</label>
             <input
               onChange={e => setEmail(e.target.value)}
               type="email"
@@ -44,7 +44,7 @@ const Login = () => {
             />
           </div>
           <div className="form-group">
-            <label for="exampleInputPassword1">Mật khẩu</label>
+            <label htmlFor="exampleInputPassword1">Mật khẩu</label>
             <input
               onChange={e => setPassword(e.target.value)}
               type="password"

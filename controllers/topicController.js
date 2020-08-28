@@ -6,63 +6,39 @@ const cloudinary = require("cloudinary").v2.api;
 
 class TopicController {
   index_get(req, res) {
-    const sortOption =
-      req.query.sortby !== "undefined" ? req.query.sortby : "date";
-    TopicModel.find({ status: "published" }).then((topics) => {
-      switch (sortOption) {
-        case "date":
-          topics.sort((a, b) => {
-            return new Date(b.createdAt) - new Date(a.createdAt);
-          });
-          break;
-        case "watch":
-          topics.sort((a, b) => {
-            return b.watched - a.watched;
-          });
-          break;
-        case "like":
-          topics.sort((a, b) => {
-            return b.like.length - a.like.length;
-          });
-          break;
-        default:
-          break;
+    TopicModel.find({ status: "published" }, (err, result) => {
+      if (err) {
+        return res.json({ success: false, err });
       }
-
-      const response = {
-        tops: topics.map((topic) => {
-          return {
-            title: topic.title,
-            address_pri: topic.address_pri,
-            address_sec: topic.address_sec,
-            description: topic.description,
-            body: topic.body,
-            coor: topic.coor,
-            imageURL: topic.imageURL,
-            date: topic.date.toLocaleString("en-US", {
-              timeZone: "Asia/Ho_Chi_Minh",
-            }),
-            _id: topic._id,
-            watched: topic.watched,
-            userID: topic.userID,
-            status: topic.status,
-            request: {
-              type: "GET",
-              url: "http://localhost:5000/api/topics/" + topic._id,
-            },
-          };
-        }),
-      };
-      res.status(200).json(response);
+      return res.json({ success: true, result });
     });
   }
 
   topics_favourite_get(req, res) {
-    const topic = TopicModel.find({}, (e, result) => {
-      result.sort((a, b) => b.like.length - a.like.length);
-      const data = result.splice(0, 4);
-      res.json({ topics: data });
-    });
+    TopicModel.find({})
+      .limit(3)
+      .sort({ like: -1 })
+      .exec((err, result) => {
+        res.json({ success: true, result });
+      });
+  }
+
+  topics_listQueue_get(req, res) {
+    if (req.query.role === "admin") {
+      TopicModel.find({ status: "queue" }, (err, result) => {
+        if (err) {
+          return res.json({ success: false, err });
+        }
+        return res.json({ success: true, result });
+      });
+    } else {
+      TopicModel.find({ status: "queue", userID: req.query.id }, (err, result) => {
+        if (err) {
+          return res.json({ success: false, err });
+        }
+        return res.json({ success: true, result });
+      });
+    }
   }
 
   topics_queue_get(req, res) {
@@ -96,87 +72,46 @@ class TopicController {
         res.status(200).json(response);
       });
     } else {
-      TopicModel.find({ status: "queue", userID: req.query.id }).then((topics) => {
-        response = {
-          tops: topics.map((topic) => {
-            return {
-              title: topic.title,
-              address_pri: topic.address_pri,
-              address_sec: topic.address_sec,
-              description: topic.description,
-              body: topic.body,
-              coor: topic.coor,
-              imageURL: topic.imageURL,
-              date: topic.date.toLocaleString("en-US", {
-                timeZone: "Asia/Ho_Chi_Minh",
-              }),
-              _id: topic._id,
-              watched: topic.watched,
-              userID: topic.userID,
-              status: topic.status,
-              request: {
-                type: "GET",
-                url: "http://localhost:5000/topics/" + topic._id,
-              },
-            };
-          }),
-        };
-        res.status(200).json(response);
-      });
+      TopicModel.find({ status: "queue", userID: req.query.id }).then(
+        (topics) => {
+          response = {
+            tops: topics.map((topic) => {
+              return {
+                title: topic.title,
+                address_pri: topic.address_pri,
+                address_sec: topic.address_sec,
+                description: topic.description,
+                body: topic.body,
+                coor: topic.coor,
+                imageURL: topic.imageURL,
+                date: topic.date.toLocaleString("en-US", {
+                  timeZone: "Asia/Ho_Chi_Minh",
+                }),
+                _id: topic._id,
+                watched: topic.watched,
+                userID: topic.userID,
+                status: topic.status,
+                request: {
+                  type: "GET",
+                  url: "http://localhost:5000/topics/" + topic._id,
+                },
+              };
+            }),
+          };
+          res.status(200).json(response);
+        }
+      );
     }
   }
 
   topics_search_get(req, res) {
-    const sortOption =
-      req.query.sortby !== "undefined" ? req.query.sortby : "date";
-    const addressFind = req.query.address;
-    TopicModel.find({ status: "published", address_pri: addressFind }).then(
-      (topics) => {
-        switch (sortOption) {
-          case "date":
-            topics.sort((a, b) => {
-              return new Date(b.createdAt) - new Date(a.createdAt);
-            });
-            break;
-          case "watch":
-            topics.sort((a, b) => {
-              return b.watched - a.watched;
-            });
-            break;
-          case "like":
-            topics.sort((a, b) => {
-              return b.like.length - a.like.length;
-            });
-            break;
-          default:
-            break;
+    TopicModel.find(
+      { status: "published", address_pri: req.query.address },
+      (err, result) => {
+        if (err) {
+          return res.json({ success: false, err });
         }
-
-        const response = {
-          tops: topics.map((topic) => {
-            return {
-              title: topic.title,
-              address_pri: topic.address_pri,
-              address_sec: topic.address_sec,
-              description: topic.description,
-              body: topic.body,
-              coor: topic.coor,
-              imageURL: topic.imageURL,
-              date: topic.date.toLocaleString("en-US", {
-                timeZone: "Asia/Ho_Chi_Minh",
-              }),
-              _id: topic._id,
-              watched: topic.watched,
-              userID: topic.userID,
-              status: topic.status,
-              request: {
-                type: "GET",
-                url: "http://localhost:5000/api/topics/" + topic._id,
-              },
-            };
-          }),
-        };
-        res.status(200).json(response);
+        return res.json({ success: true, result });
       }
     );
   }
@@ -205,7 +140,6 @@ class TopicController {
 
   topics_user_published_get(req, res) {
     let _id = req.query.id;
-
     TopicModel.find({ userID: _id, status: "published" }, (e, result) => {
       res.json({ status: true, result });
     });
@@ -269,33 +203,91 @@ class TopicController {
     }
   }
 
-  async topics_details_post(req, res) {
-    let id = req.params.id;
-    let topic = await TopicModel.findById(id);
-    if (req.body.likeAction && req.body.like == "false") {
-      topic.like = [...topic.like, req.body.userID];
-      await topic.save();
-      res.json({ success: true, countLike: topic.like.length });
-    } else if (req.body.likeAction) {
-      topic.like.splice(topic.like.indexOf(req.body.userID), 1);
-      await topic.save();
-      res.json({ success: true, countLike: topic.like.length });
-    } else {
-      var newComment = req.body;
-      newComment.time = new Date().toLocaleString("en-US", {
-        timeZone: "Asia/Ho_Chi_Minh",
-      });
+  topics_details_published_data_get(req, res) {
+    TopicModel.findById(req.params.id, (err, result) => {
+      if (err) {
+        return res.json({ success: false, err });
+      }
+      if (result.status === "queue" && req.query.role !== "admin") {
+        return res.json({ success: false });
+      }
 
-      try {
-        topic.comments = [...topic.comments, newComment];
-        await topic.save();
-        topic.comments.sort(function (a, b) {
-          // Turn your strings into dates, and then subtract them
-          // to get a value that is either negative, positive, or zero.
-          return new Date(b.time) - new Date(a.time);
-        });
-        res.json(topic.comments);
-      } catch (error) {}
+      result.comments.sort(function (a, b) {
+        return new Date(b.time) - new Date(a.time);
+      });
+      if (result.like.includes(req.query.userID)) {
+        result = { ...result._doc, liked: true };
+      }
+      return res.json({ success: true, result });
+    });
+  }
+
+  // async topics_details_post(req, res) {
+  //   let id = req.params.id;
+  //   let topic = await TopicModel.findById(id);
+  //   if (req.body.likeAction && req.body.like == "false") {
+  //     topic.like = [...topic.like, req.body.userID];
+  //     await topic.save();
+  //     res.json({ success: true, countLike: topic.like.length });
+  //   } else if (req.body.likeAction) {
+  //     topic.like.splice(topic.like.indexOf(req.body.userID), 1);
+  //     await topic.save();
+  //     res.json({ success: true, countLike: topic.like.length });
+  //   } else {
+  //     var newComment = req.body;
+  //     newComment.time = new Date().toLocaleString("en-US", {
+  //       timeZone: "Asia/Ho_Chi_Minh",
+  //     });
+
+  //     try {
+  //       topic.comments = [...topic.comments, newComment];
+  //       await topic.save();
+  //       topic.comments.sort(function (a, b) {
+  //         // Turn your strings into dates, and then subtract them
+  //         // to get a value that is either negative, positive, or zero.
+  //         return new Date(b.time) - new Date(a.time);
+  //       });
+  //       res.json(topic.comments);
+  //     } catch (error) {}
+  //   }
+  // }
+
+  async topics_details_likeAction_put(req, res) {
+    // just topics published
+    try {
+      const topic = await TopicModel.findById(req.params.id);
+      if (topic.status === "queue") {
+        return res.json({ success: false });
+      }
+      if (!topic.like.includes(req.body.userID)) {
+        topic.like = [...topic.like, req.body.userID];
+      } else {
+        const index = topic.like.indexOf(req.body.userID);
+        if (index > -1) {
+          topic.like.splice(index, 1);
+        }
+      }
+      await topic.save();
+      return res.json({ success: true, countLike: topic.like.length });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async topics_details_addComment_put(req, res) {
+    const newComment = req.body;
+    newComment.time = new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Ho_Chi_Minh",
+    });
+    try {
+      const topic = await TopicModel.findOne({ _id: req.params.id });
+      if (topic.status === "queue") {
+        return res.json({ success: false });
+      }
+      topic.comments = [...topic.comments, newComment];
+      await topic.save();
+      res.json({ success: true, newComment });
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -334,17 +326,27 @@ class TopicController {
     }
   }
 
-  async topics_details_accept_post(req, res) {
+  async topics_details_accept_put(req, res) {
     try {
-      const topic = await TopicModel.findById(req.params.id);
-      topic.status = "published";
-      await topic.save();
+      // const topic = await TopicModel.findById(req.params.id);
+      // topic.status = "published";
+      // await topic.save();
+      TopicModel.findByIdAndUpdate(
+        req.params.id,
+        { status: "published" },
+        (err, result) => {
+          if (err) {
+            return res.json({ success: false, err });
+          }
+          return res.json({ success: true });
+        }
+      );
     } catch (error) {}
   }
 
-  async topics_details_update_post(req, res) {
+  async topics_details_update_put(req, res) {
     try {
-      let topic = await TopicModel.findById(req.params.id);
+      const topic = await TopicModel.findById(req.params.id);
       topic.title = req.body.title;
       topic.address_pri = req.body.address_pri;
       topic.address_sec = req.body.address_sec;

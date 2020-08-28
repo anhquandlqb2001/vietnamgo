@@ -8,15 +8,21 @@ class UserController {
   }
 
   async user_role_up_get(req, res) {
-    const user = await UserModel.findById(req.query.id);
-    user.role = "creator";
-    await user.save();
+    try {
+      const user = await UserModel.findById(req.query.id);
+      user.role = "creator";
+      await user.save();
+      return res.json({ success: true });
+    } catch (err) {}
   }
 
   async user_role_down_get(req, res) {
-    const user = await UserModel.findById(req.query.id);
-    user.role = "customer";
-    await user.save();
+    try {
+      const user = await UserModel.findById(req.query.id);
+      user.role = "customer";
+      await user.save();
+      return res.json({ success: true });
+    } catch (error) {}
   }
 }
 

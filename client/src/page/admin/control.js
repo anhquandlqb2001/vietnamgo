@@ -5,20 +5,28 @@ const Control = () => {
   const [windowWidth, setWindowWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
+
+  useEffect(() => {
+    updateDimensions()
+    window.addEventListener("resize", updateDimensions);
+  }, []);
+
+  useEffect(() => {
+    renderData()
+    console.log(isMobile)
+  }, [isMobile])
+
   const updateDimensions = () => {
     let width = typeof window !== "undefined" ? window.innerWidth : 0;
     setWindowWidth(width);
-    if (windowWidth < 576) {
+    console.log(width)
+    if (width < 576) {
       setIsMobile(true);
     } else {
       setIsMobile(false);
     }
   };
 
-  useEffect(() => {
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-  }, [windowWidth]);
   const renderData = () => {
     if (!isMobile) {
       return (

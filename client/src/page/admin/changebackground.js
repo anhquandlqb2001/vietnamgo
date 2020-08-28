@@ -7,7 +7,7 @@ const ChangeBackground = () => {
   const [Progress, setProgress] = useState(false);
 
   const SlidePreview = (props) => {
-    if (props.index == 0) {
+    if (props.index === 0) {
       return (
         <div className="carousel-item active">
           <img
@@ -68,7 +68,7 @@ const ChangeBackground = () => {
   return (
     <div className="container">
       <div className="form-group">
-        <label for="slide-img">Thay background</label>
+        <label htmlFor="slide-img">Thay background</label>
         <input
           type="file"
           name="slide-img"

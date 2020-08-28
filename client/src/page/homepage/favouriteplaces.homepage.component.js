@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
@@ -42,13 +42,8 @@ const FavourPlace = () => {
     window.addEventListener("resize", updateDimensions);
   }, []);
 
-  useEffect(() => {
-    window.removeEventListener("resize", updateDimensions);
-  }, [window.innerWidth]);
-
   const updateDimensions = () => {
     let windowWidth = typeof window !== "undefined" ? window.innerWidth : 0;
-
     setWindowWidth(windowWidth);
   };
 

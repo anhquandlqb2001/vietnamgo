@@ -5,7 +5,7 @@ import "./topic.css";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./topic.css";
-import auth from "../../js/auth";
+// import auth from "../../js/auth";
 import UserProfile from "../../js/UserProfile";
 import ReactPaginate from "react-paginate";
 const ReactMarkdown = require("react-markdown");
@@ -15,8 +15,8 @@ mapboxgl.accessToken =
 
 function Topic(props) {
   const [topic, setTopic] = useState([]);
-  // const [coor, setCoor] = useState([])
   const [listImg, setListImg] = useState([]);
+  const [DataComments, setDataComments] = useState([]);
   const [comments, setComments] = useState([]);
   const [map, setMap] = useState(null);
   const [newComment, setNewComment] = useState([]);
@@ -40,32 +40,36 @@ function Topic(props) {
     axios
       .get("/api/topics/" + props.match.params.id, {
         params: {
-          id: UserProfile.getUserId(),
+          userID: UserProfile.getUserId(),
           role: UserProfile.getUserRole(),
         },
       })
       .then((response) => {
         console.log(response.data);
-        if (!response.data.status) {
-          return props.history.push("/");
-        } else if (
-          (response.data.topic.status === "queue" &&
-            auth.isAdmin(UserProfile.getUserRole())) ||
-          (response.data.topic.status === "queue" &&
-            auth.isCreator(UserProfile.getUserRole())) ||
-          (response.data.status && response.data.topic.status === "published")
-        ) {
-          let result = response.data.topic;
-          result.username = response.data.username;
-          setTopic(result);
-          // setCoor(result.coor)
-          setCountLike(result.like.length);
-          setLike(result.like.includes(UserProfile.getUserId()));
-          setListImg(result.imageURL);
-        } else {
+        if (!response.data.success) {
           return props.history.push("/");
         }
+        let result = response.data.result;
+        result.username = response.data.username;
+        setTopic(result);
+        setCountLike(result.like.length);
+        setLike(result.liked);
+        setListImg(result.imageURL);
+        setDataComments(result.comments);
+        const slice = result.comments.slice(offset, offset + perPage);
+        setComments(slice);
+        setPageCount(Math.ceil(result.comments.length / perPage));
       });
+  };
+
+  useEffect(() => {
+    getComments();
+  }, [currentPage]);
+
+  const getComments = () => {
+    const slice = DataComments.slice(offset, offset + perPage);
+    setComments(slice);
+    setPageCount(Math.ceil(DataComments.length / perPage));
   };
 
   useEffect(() => {
@@ -81,29 +85,6 @@ function Topic(props) {
     } else {
       setIsMobile(false);
     }
-  };
-
-  useEffect(() => {
-    getComments();
-  }, [currentPage]);
-
-  const getComments = () => {
-    axios
-      .get("/api/topics/" + props.match.params.id, {
-        params: { action: "getComment" },
-      })
-      .then((response) => {
-        console.log(response.data);
-        if (!response.data.status) {
-        } else {
-          let result = response.data.topic;
-          result.username = response.data.username;
-          const data = result.comments;
-          const slice = data.slice(offset, offset + perPage);
-          setComments(slice);
-          setPageCount(Math.ceil(data.length / perPage));
-        }
-      });
   };
 
   useEffect(() => {
@@ -190,8 +171,10 @@ function Topic(props) {
         text: newComment,
       };
 
-      axios.post("/api/topics/" + props.match.params.id, data).then((res) => {
-        setComments(res.data);
+      axios.put("/api/topics/" + props.match.params.id + "/comments", data).then((res) => {
+        if (res.data.success) {
+          setComments([res.data.newComment, ...DataComments]);
+        }
       });
     }
   };
@@ -202,11 +185,10 @@ function Topic(props) {
       return (window.location = "/login");
     }
     const data = {
-      likeAction: true,
-      like: e.target.value,
       userID: UserProfile.getUserId(),
+      role: UserProfile.getUserRole()
     };
-    axios.post("/api/topics/" + props.match.params.id, data).then((res) => {
+    axios.put("/api/topics/" + props.match.params.id + "/like", data).then((res) => {
       if (res.data.success) {
         setLike(!like);
         setCountLike(res.data.countLike);

@@ -1,16 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-// import "./style.css";
-// import mapboxgl from "mapbox-gl";
 import ReactPaginate from "react-paginate";
 import UserProfile from "../../js/UserProfile";
 import auth from "../../js/auth";
 
-// mapboxgl.accessToken =
-//   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
-
-const Queue = () =>  {
+const Queue = () => {
   const [Topics, setTopics] = useState([]);
   const [offset, setoffset] = useState(0);
   const [perPage, setperPage] = useState(10);
@@ -18,38 +13,29 @@ const Queue = () =>  {
   const [currentPage, setCurrentPage] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
   const [currentStyle, setCurrentStyle] = useState(null);
-  // const [map, setMap] = useState(null);
-  // const mapContainer = useRef(null);
-
-  // useEffect(() => {
-  //   const initializeMap = ({ setMap, mapContainer }) => {
-  //     const map = new mapboxgl.Map({
-  //       container: mapContainer.current,
-  //       style: "mapbox://styles/mapbox/streets-v11", // stylesheet location
-  //       center: coor,
-  //       zoom: 6,
-  //     });
-
-  //     map.on("load", () => {
-  //       setMap(map);
-  //       map.resize();
-  //     });
-  //   };
-  //   if (!map) initializeMap({ setMap, mapContainer });
-  // }, [map]);
 
   useEffect(() => {
     getTopics();
   }, [currentPage]);
 
   const getTopics = () => {
-    axios.get(`/api/topics/queue`, {params: { role: UserProfile.getUserRole(), id: UserProfile.getUserId() }}).then((res) => {
-      const data = res.data.tops;
-      const slice = data.slice(offset, offset + perPage);
-      setTopics(slice);
-      setperPage(10);
-      setPageCount(Math.ceil(data.length / perPage));
-    });
+    axios
+      .get(`/api/topics/queue/data`, {
+        params: {
+          role: UserProfile.getUserRole(),
+          id: UserProfile.getUserId(),
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.success) {
+          const data = res.data.result;
+          const slice = data.slice(offset, offset + perPage);
+          setTopics(slice);
+          setperPage(10);
+          setPageCount(Math.ceil(data.length / perPage));
+        }
+      });
   };
 
   const handlePageClick = (e) => {
@@ -96,13 +82,7 @@ const Queue = () =>  {
               />
             </Link>
           </div>
-          <div
-            className="col-md-8 col-8 card-right h-100"
-            id={topic._id}
-            // onClick={() => {
-            //   changeLocation(topic.coor, topic._id);
-            // }}
-          >
+          <div className="col-md-8 col-8 card-right h-100" id={topic._id}>
             <div className="card-body p-1">
               <Link to={`/topics/${topic._id}`}>
                 <h5 className="card-title mb-1">{topic.title}</h5>
@@ -186,30 +166,23 @@ const Queue = () =>  {
         console.log(response.data);
       });
 
-    setTopics(Topics.filter((el) => el._id != id));
+    setTopics(Topics.filter((el) => el._id !== id));
   };
 
-  // const changeLocation = (coor, id) => {
-  //   setCoor(coor);
-  //   document.getElementById(id).addEventListener("click", function () {
-  //     map.flyTo({
-  //       center: coor,
-  //       essential: true,
-  //       zoom: 12,
-  //     });
-  //   });
-  // };
-
   const accept = (id) => {
-    axios.post("/api/topics/accept/" + id).then((res) => console.log(res.data));
-
-    setTopics(Topics.filter((el) => el._id != id));
+    axios.put("/api/topics/accept/" + id).then((res) => {
+      res.data.success && setTopics(Topics.filter((el) => el._id !== id));
+    });
   };
 
   return (
-    <div style={{  }} className="container">
-      <div style={{  }}>
-        {Topics=='' ? <h1 className="text-center">Chưa có bài viết nào</h1> : ''}
+    <div className="container">
+      <div>
+        {Topics == "" ? (
+          <h1 className="text-center">Chưa có bài viết nào</h1>
+        ) : (
+          ""
+        )}
         {postData}
 
         <ReactPaginate
@@ -236,13 +209,8 @@ const Queue = () =>  {
           activeClassName={"active"}
         />
       </div>
-      {/* <div
-          ref={(el) => (mapContainer.current = el)}
-          id="map-container"
-          className="map-container col-md-6 d-none d-md-block"
-        ></div> */}
     </div>
   );
-}
+};
 
 export default Queue;

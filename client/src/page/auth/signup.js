@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import UserProfile from '../../js/UserProfile'
 import auth from '../../js/auth'
