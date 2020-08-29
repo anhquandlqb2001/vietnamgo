@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import ReactPaginate from "react-paginate";
-import UserProfile from "../../js/UserProfile";
+import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 
 const Queue = () => {
@@ -20,14 +20,8 @@ const Queue = () => {
 
   const getTopics = () => {
     axios
-      .get(`/api/topics/queue/data`, {
-        params: {
-          role: UserProfile.getUserRole(),
-          id: UserProfile.getUserId(),
-        },
-      })
+      .get(`/api/topics/queue/data`)
       .then((res) => {
-        console.log(res.data);
         if (res.data.success) {
           const data = res.data.result;
           const slice = data.slice(offset, offset + perPage);
@@ -94,9 +88,9 @@ const Queue = () => {
                     Ngày đăng: {topic.date.split("T")[0]}
                   </small>
                 </p>
-                {(auth.isCreator(UserProfile.getUserRole()) &&
-                  UserProfile.getUserId() === topic.userID) ||
-                auth.isAdmin(UserProfile.getUserRole()) ? (
+                {(auth.isCreator(Profile.getUserRole()) &&
+                  Profile.getUserId() === topic.userID) ||
+                auth.isAdmin(Profile.getUserRole()) ? (
                   <div className="d-flex ml-4 admin-options">
                     <Link
                       to={{
@@ -125,7 +119,7 @@ const Queue = () => {
               </div>
               <div>
                 {topic.status === "queue" &&
-                auth.isAdmin(UserProfile.getUserRole()) ? (
+                auth.isAdmin(Profile.getUserRole()) ? (
                   <div className="d-flex justify-content-between mt-1">
                     <p className="text-muted" style={{ fontSize: "0.8rem" }}>
                       Đang chờ duyệt
@@ -138,7 +132,7 @@ const Queue = () => {
                     </button>
                   </div>
                 ) : topic.status === "queue" &&
-                  auth.isCreator(UserProfile.getUserRole()) ? (
+                  auth.isCreator(Profile.getUserRole()) ? (
                   <div>
                     <p className="text-muted">Đang chờ duyệt</p>
                   </div>
@@ -157,9 +151,9 @@ const Queue = () => {
     axios
       .delete("/api/topics/" + id, {
         params: {
-          role: UserProfile.getUserRole(),
+          role: Profile.getUserRole(),
           userID: userID,
-          userIDDelete: UserProfile.getUserId(),
+          userIDDelete: Profile.getUserId(),
         },
       })
       .then((response) => {

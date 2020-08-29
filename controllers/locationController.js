@@ -1,7 +1,7 @@
 const LocationModel = require("../models/location.models")
 
 class LocationController {
-  async location_add__checkExist_post(req, res, next) {
+  async location_add_checkExist_post(req, res, next) {
     try {
       const checkExistLocation = await LocationModel.findOne({
         address: req.body.address,

@@ -50,6 +50,9 @@ const topicSchema = new mongoose.Schema({
   },
   like: {
     type: Array
+  },
+  author: {
+    type: String
   }
 }, {
   timestamps: true,

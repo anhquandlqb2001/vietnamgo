@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link, useHistory } from "react-router-dom";
 import ReactPaginate from "react-paginate";
-import UserProfile from "../../js/UserProfile";
+import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -179,9 +179,9 @@ const Topics = (props) => {
                     Ngày đăng: {topic.date.split("T")[0]}
                   </small>
                 </p>
-                {(auth.isCreator(UserProfile.getUserRole()) &&
-                  UserProfile.getUserId() === topic.userID) ||
-                auth.isAdmin(UserProfile.getUserRole()) ? (
+                {(auth.isCreator(Profile.getUserRole()) &&
+                  Profile.getUserId() === topic.userID) ||
+                auth.isAdmin(Profile.getUserRole()) ? (
                   <div className="d-flex admin-options">
                     <Link
                       to={{
@@ -220,9 +220,9 @@ const Topics = (props) => {
     axios
       .delete("/api/topics/" + id, {
         params: {
-          role: UserProfile.getUserRole(),
+          role: Profile.getUserRole(),
           userID: userID,
-          userIDDelete: UserProfile.getUserId(),
+          userIDDelete: Profile.getUserId(),
         },
       })
       .then((response) => {

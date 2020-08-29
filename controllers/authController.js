@@ -1,35 +1,37 @@
-const UserModel = require("../models/user.models")
-const bcrypt = require('bcrypt');
+const UserModel = require("../models/user.models");
+const bcrypt = require("bcrypt");
+const passport = require("passport");
+const jwt = require('jsonwebtoken')
 
 class AuthController {
-  async auth_login_post(req, res) {
-    const email = req.body.email;
-    const password = req.body.password;
+  auth_login_validate(req, res, next) {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.json({
+        success: false,
+        info: {
+          message: "Empty field",
+        },
+      });
+    }
+    next();
+  }
 
-    await UserModel.findOne({ email: email }, async (e, result) => {
-      if (result == null) {
-        res.json({ status: false, message: "Sai địa chỉ email" });
-      } else {
-        try {
-          if (await bcrypt.compare(password, result.password)) {
-            res.json({
-              status: true,
-              user: {
-                username: result.username,
-                role: result.role,
-                id: result._id,
-              },
-              message: "Đăng nhập thành công",
-            });
-          } else {
-            res.json({
-              status: false,
-              message: "Đăng nhập thất bại, sai mật khẩu",
-            });
-          }
-        } catch (e) {}
+  auth_login_verify(req, res, next) {
+    return passport.authenticate(
+      "local",
+      { session: false },
+      (err, user, info) => {
+        if (err) {
+          return res.json(err);
+        }
+        if (user) {
+          const usr = {username: user.username, role: user.role, email: user.email, userID: user._id}
+          const accessToken = generateAccessToken(usr)
+          res.json({success: true, accessToken: accessToken, user: usr})
+        }
       }
-    });
+    )(req, res, next);
   }
 
   async auth_register_checkEmailExist(req, res, next) {
@@ -53,14 +55,13 @@ class AuthController {
       });
 
       const user = await newUser.save();
-      const userPackage = {
-        username: user.username,
-        role: user.role,
-        id: user._id,
-      };
-      res.json({ userPackage, status: true });
+      res.json({ success: true });
     } catch (error) {}
   }
+}
+
+function generateAccessToken(user) {
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
 }
 
 module.exports = new AuthController();

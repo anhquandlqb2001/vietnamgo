@@ -6,17 +6,29 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Profile from "../../js/UserProfile";
+import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
+
+axios.defaults.headers.common[
+  "authorization"
+] = `Bearer ${Profile.getAccessToken()}`;
 
 const Home = () => {
-
-  const [Search, setSearch] = useState('')
-  const [Address, setAddress] = useState([])
+  const [Search, setSearch] = useState("");
+  const [Address, setAddress] = useState([]);
 
   useEffect(() => {
     axios.get("/api/location").then((res) => {
-      setAddress(res.data)
+      setAddress(res.data);
     });
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("/api/auth/test")
+      .then((res) => console.log(res))
+      .catch((e) => AUTHENTICATE_ERROR(e.response.status));
+  });
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -32,57 +44,57 @@ const Home = () => {
         },
       })
       .then((res) => console.log(res.data));
-  }
+  };
 
-    return (
-      <div>
-        <div className="container my-2">
-          <form onSubmit={onSubmit}>
-            <div className="form-group">
-              <label>Bạn muốn đi đâu?</label>
-              <Autocomplete
-                id="combo-box-demo"
-                options={Address}
-                getOptionLabel={(option) => option.address}
-                style={{ width: 300 }}
-                noOptionsText={'Chua co dia diem nao'}
-                onChange={(e, value) => {
-                  setSearch(value.address)
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    name="address"
-                    {...params}
-                    label="Địa điểm"
-                    placeholder="Vd: Đà Nẵng, Nha Trang..."
-                    variant="outlined"
-                  />
-                )}
-              />
-            </div>
-            <Link
-              to={{
-                pathname: `/topics/search`,
-                search: `address=${Search}`,
-                state: { search: Search },
+  return (
+    <div>
+      <div className="container my-2">
+        <form onSubmit={onSubmit}>
+          <div className="form-group">
+            <label>Bạn muốn đi đâu?</label>
+            <Autocomplete
+              id="combo-box-demo"
+              options={Address}
+              getOptionLabel={(option) => option.address}
+              style={{ width: 300 }}
+              noOptionsText={"Chua co dia diem nao"}
+              onChange={(e, value) => {
+                setSearch(value.address);
               }}
-              type="submit"
-              className="btn btn-primary"
-            >
-              Tìm kiếm
-            </Link>
-          </form>
-        </div>
-        <SlideShow />
-        <div className="container">
-          <FavourPlace />
-
-          <h2 style={{ textAlign: "center" }}>Các địa điểm yêu thích</h2>
-          <FavouriteTopics />
-          {/* <PlacesAround /> */}
-        </div>
+              renderInput={(params) => (
+                <TextField
+                  name="address"
+                  {...params}
+                  label="Địa điểm"
+                  placeholder="Vd: Đà Nẵng, Nha Trang..."
+                  variant="outlined"
+                />
+              )}
+            />
+          </div>
+          <Link
+            to={{
+              pathname: `/topics/search`,
+              search: `address=${Search}`,
+              state: { search: Search },
+            }}
+            type="submit"
+            className="btn btn-primary"
+          >
+            Tìm kiếm
+          </Link>
+        </form>
       </div>
-    );
-}
+      <SlideShow />
+      <div className="container">
+        <FavourPlace />
 
-export default Home
+        <h2 style={{ textAlign: "center" }}>Các địa điểm yêu thích</h2>
+        <FavouriteTopics />
+        {/* <PlacesAround /> */}
+      </div>
+    </div>
+  );
+};
+
+export default Home;

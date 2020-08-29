@@ -13,13 +13,11 @@ const Control = () => {
 
   useEffect(() => {
     renderData()
-    console.log(isMobile)
   }, [isMobile])
 
   const updateDimensions = () => {
     let width = typeof window !== "undefined" ? window.innerWidth : 0;
     setWindowWidth(width);
-    console.log(width)
     if (width < 576) {
       setIsMobile(true);
     } else {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import data from "../../js/tinh-tp.json";
 import axios from "axios";
-import UserProfile from "../../js/UserProfile";
+import Profile from "../../js/UserProfile";
 const items = [];
 
 for (const key in data) {
@@ -41,7 +41,8 @@ const NewTopic = () => {
     formData.append("date", new Date());
     formData.append("coorx", Coor[0]);
     formData.append("coory", Coor[1]);
-    formData.append("id", UserProfile.getUserId());
+    formData.append("id", Profile.getUserId());
+    formData.append("author", Profile.getUsername())
 
     const config = {
       headers: {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import auth from "../../js/auth";
 
-const UserControl = () => {
+const UserControl = (props) => {
   const [users, setUsers] = useState([]);
   const [windowWidth, setWindowWidth] = useState(0);
   const [isMobile, setIsMobile] = useState(null);
@@ -101,8 +101,8 @@ const UserControl = () => {
   });
 
   const roleUp = (id) => {
-    axios.get("/api/user/up", { params: { id: id } }).then((res) => {
-      console.log("aaa");
+    axios.put("/api/user/" + id + "/up").then((res) => {
+      
       if (res.data.success) {
         setUsers([
           ...users.filter((user) => user._id !== id),
@@ -113,7 +113,7 @@ const UserControl = () => {
   };
 
   const roleDown = (id) => {
-    axios.get("/api/user/down", { params: { id: id } }).then((res) => {
+    axios.put("/api/user/" + id + "/down").then((res) => {
       if (res.data.success) {
         setUsers([
           ...users.filter((user) => user._id !== id),

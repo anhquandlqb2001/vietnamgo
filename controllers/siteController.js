@@ -1,4 +1,5 @@
 const SlideImageModel = require("../models/slideimg.model")
+const cloudinary = require('cloudinary').v2.api
 
 class SiteController {
   site_slideImage_get(req, res) {

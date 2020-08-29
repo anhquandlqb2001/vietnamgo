@@ -7,18 +7,18 @@ class UserController {
     });
   }
 
-  async user_role_up_get(req, res) {
+  async user_role_up_put(req, res) {
     try {
-      const user = await UserModel.findById(req.query.id);
+      const user = await UserModel.findById(req.params.id);
       user.role = "creator";
       await user.save();
       return res.json({ success: true });
     } catch (err) {}
   }
 
-  async user_role_down_get(req, res) {
+  async user_role_down_put(req, res) {
     try {
-      const user = await UserModel.findById(req.query.id);
+      const user = await UserModel.findById(req.params.id);
       user.role = "customer";
       await user.save();
       return res.json({ success: true });

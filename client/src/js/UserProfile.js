@@ -33,6 +33,14 @@ var UserProfile = (function() {
     return localStorage.getItem('role')
   }
 
+  var setAccessToken = function(token) {
+    localStorage.setItem('token', token)
+  }
+
+  var getAccessToken = function() {
+    return localStorage.getItem('token')
+  }
+
   return {
     getUsername: getUsername,
     setUsername: setUsername,
@@ -41,9 +49,53 @@ var UserProfile = (function() {
     isLogin: isLogin,
     setIsLogin: setIsLogin,
     getUserRole: getUserRole,
-    setUserRole: setUserRole
+    setUserRole: setUserRole,
+    getAccessToken: getAccessToken,
+    setAccessToken: setAccessToken
   }
 
 })();
 
-export default UserProfile;
+class Profile {
+  getUsername() {
+    return localStorage.getItem('username')   // Or pull this from cookie/localStorage
+  };
+  setUsername = function(username) {
+    // Also set this in cookie/localStorage
+    localStorage.setItem('username', username)
+  };
+
+  getUserId() {
+    return localStorage.getItem('id')
+  }
+
+  setUserId(id) {
+    localStorage.setItem('id', id)
+  }
+
+  isLogin() {
+    return localStorage.getItem('islogin')
+  }
+
+  setIsLogin(bool) {
+    localStorage.setItem('islogin', bool)
+  }
+
+  setUserRole(role) {
+    localStorage.setItem('role', role)
+  }
+
+  getUserRole() {
+    return localStorage.getItem('role')
+  }
+
+  setAccessToken(token) {
+    localStorage.setItem('token', token)
+  }
+
+  getAccessToken() {
+    return localStorage.getItem('token')
+  }
+}
+
+export default new Profile();

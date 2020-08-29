@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import UserProfile from '../../js/UserProfile'
+import Profile from '../../js/UserProfile'
 import auth from '../../js/auth'
 
 const Signup = () => {
@@ -17,13 +17,9 @@ const Signup = () => {
     };
 
     axios.post("/api/auth/register", data).then((res) => {
-      if (res.data.status) {
-        UserProfile.setUsername(res.data.userPackage.username);
-        UserProfile.setIsLogin(res.data.status);
-        UserProfile.setUserRole(res.data.userPackage.role);
-        UserProfile.setUserId(res.data.userPackage.id);
+      if (res.data.success) {
         auth.login(() => {
-          window.location = "/";
+          window.location = "/login";
         });
       } else {
         alert(res.data.message);

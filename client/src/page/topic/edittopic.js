@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import data from "../../js/tinh-tp.json";
 import axios from "axios";
 import "./topic.css";
-import UserProfile from "../../js/UserProfile";
+import Profile from "../../js/UserProfile";
 const items = [];
 
 for (const key in data) {
@@ -22,23 +22,10 @@ const EditTopic = (props) => {
   const [UserID, setUserID] = useState("");
 
   useEffect(() => {
-    const getUserId = async () => {
-      await axios.get("/api/topics/" + props.match.params.id).then((res) => {
-        setUserID(res.data.topic.userID);
-      });
-    };
-    getUserId();
-
     axios
-      .get("/api/topics/edit/" + props.match.params.id, {
-        params: {
-          role: UserProfile.getUserRole(),
-          userID: UserID,
-          userIDDelete: UserProfile.getUserId(),
-        },
-      })
+      .get("/api/topics/edit/" + props.match.params.id)
       .then((res) => {
-        if (!res.data.status) {
+        if (!res.data.success) {
           return props.history.push("/");
         } else {
           setTitle(res.data.title);
@@ -49,11 +36,16 @@ const EditTopic = (props) => {
           setCoor(res.data.coor);
           setOldImg(res.data.imageURL);
         }
+      })
+      .catch((e) => {
+        console.log("aa");
+        // if (e.response.status === 403) {
+        // }
       });
 
-    axios.get("/api/location").then((res) => {
-      setAddress(res.data);
-    });
+    // axios.get("/api/location").then((res) => {
+    //   setAddress(res.data);
+    // });
   }, []);
 
   const onSubmit = (e) => {
@@ -83,10 +75,10 @@ const EditTopic = (props) => {
       .put("/api/topics/update/" + props.match.params.id, formData, config)
       .then((res) => {
         if (res.data.success) {
-          alert(res.data.message)
-          return window.location = "/topics/" + props.match.params.id;
+          alert(res.data.message);
+          return (window.location = "/topics/" + props.match.params.id);
         }
-        return alert("Cap nhat that bai")
+        return alert("Cap nhat that bai");
       });
   };
 

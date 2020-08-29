@@ -6,7 +6,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./topic.css";
 // import auth from "../../js/auth";
-import UserProfile from "../../js/UserProfile";
+import Profile from "../../js/UserProfile";
 import ReactPaginate from "react-paginate";
 const ReactMarkdown = require("react-markdown");
 
@@ -19,7 +19,7 @@ function Topic(props) {
   const [DataComments, setDataComments] = useState([]);
   const [comments, setComments] = useState([]);
   const [map, setMap] = useState(null);
-  const [newComment, setNewComment] = useState([]);
+  const [newComment, setNewComment] = useState();
   const [like, setLike] = useState(false);
   const [countLike, setCountLike] = useState(0);
   const [imgZoom, setImgZoom] = useState(null);
@@ -40,8 +40,8 @@ function Topic(props) {
     axios
       .get("/api/topics/" + props.match.params.id, {
         params: {
-          userID: UserProfile.getUserId(),
-          role: UserProfile.getUserRole(),
+          userID: Profile.getUserId(),
+          role: Profile.getUserRole(),
         },
       })
       .then((response) => {
@@ -63,8 +63,9 @@ function Topic(props) {
   };
 
   useEffect(() => {
+    setPageCount(Math.ceil(DataComments.length / perPage));
     getComments();
-  }, [currentPage]);
+  }, [currentPage, DataComments]);
 
   const getComments = () => {
     const slice = DataComments.slice(offset, offset + perPage);
@@ -160,33 +161,28 @@ function Topic(props) {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (!UserProfile.isLogin()) {
+    if (!Profile.isLogin()) {
       alert("Đăng nhập để có thể bình luận");
       window.location = "/login";
     } else {
       document.getElementById("commentTextA").value = "";
-      const data = {
-        username: UserProfile.getUsername(),
-        userID: UserProfile.getUserId(),
-        text: newComment,
-      };
 
-      axios.put("/api/topics/" + props.match.params.id + "/comments", data).then((res) => {
+      axios.put("/api/topics/" + props.match.params.id + "/comments", {text: newComment}).then((res) => {
         if (res.data.success) {
-          setComments([res.data.newComment, ...DataComments]);
+          setDataComments([res.data.newComment, ...DataComments]);
         }
       });
     }
   };
 
   const handleLike = (e) => {
-    if (!UserProfile.isLogin()) {
+    if (!Profile.isLogin()) {
       alert("Bạn phải đăng nhập mới có thể thích bài viết");
       return (window.location = "/login");
     }
     const data = {
-      userID: UserProfile.getUserId(),
-      role: UserProfile.getUserRole()
+      userID: Profile.getUserId(),
+      role: Profile.getUserRole()
     };
     axios.put("/api/topics/" + props.match.params.id + "/like", data).then((res) => {
       if (res.data.success) {
@@ -242,7 +238,7 @@ function Topic(props) {
             >
               {like ? "Bỏ thích" : "Thích"}
             </button>
-            <p className="lead text-muted mt-2">Người đăng: {topic.username}</p>
+            <p className="lead text-muted mt-2">Người đăng: {topic.author}</p>
           </div>
 
           <div className="d-flex w-100 justify-content-between">

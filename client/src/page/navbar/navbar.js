@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import UserProfile from "../../js/UserProfile";
+import Profile from "../../js/UserProfile";
 import "../style.css";
 import auth from "../../js/auth";
 const Navbar = () => {
@@ -40,13 +40,13 @@ const Navbar = () => {
               </Link>
             </li>
 
-            {auth.isAdmin(UserProfile.getUserRole()) ? (
+            {auth.isAdmin(Profile.getUserRole()) ? (
               <div style={{ display: "contents" }}>
                 <Link className="nav-link" to="/admin/location/add">
                   Quản lý
                 </Link>
               </div>
-            ) : auth.isCreator(UserProfile.getUserRole()) ? (
+            ) : auth.isCreator(Profile.getUserRole()) ? (
               <div style={{ display: "contents" }}>
                 <Link className="nav-link" to="/user/topics/queue">
                 Cá nhân
@@ -55,7 +55,7 @@ const Navbar = () => {
             ) : (
               ""
             )}
-            {UserProfile.isLogin() ? (
+            {Profile.isLogin() ? (
               <div className="haslogin-container">
                 <button
                   className="nav-link btn btn-danger"

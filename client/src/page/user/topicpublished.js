@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 // import "./style.css";
-import mapboxgl from "mapbox-gl";
 import ReactPaginate from "react-paginate";
-import UserProfile from "../../js/UserProfile";
+import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 
 function TopicPublished() {
@@ -19,19 +18,13 @@ function TopicPublished() {
     getTopics();
   }, [currentPage]);
   const getTopics = () => {
-    axios
-      .get(`/api/topics/userpublished`, {
-        params: {
-          id: UserProfile.getUserId(),
-        },
-      })
-      .then((res) => {
-        const data = res.data.result;
-        const slice = data.slice(offset, offset + perPage);
-        setTopics(slice);
-        setperPage(10);
-        setPageCount(Math.ceil(data.length / perPage));
-      });
+    axios.get(`/api/topics/userpublished`).then((res) => {
+      const data = res.data.result;
+      const slice = data.slice(offset, offset + perPage);
+      setTopics(slice);
+      setperPage(10);
+      setPageCount(Math.ceil(data.length / perPage));
+    });
   };
 
   const handlePageClick = (e) => {
@@ -71,7 +64,7 @@ function TopicPublished() {
           <div className="col-md-4 col-4">
             <Link to={`/topics/${topic._id}`}>
               <img
-                src={`/${topic.imageURL[0].filename}`}
+                src={`${topic.imageURL[0].url}`}
                 alt="img"
                 className="card-img"
                 style={currentStyle}
@@ -90,9 +83,9 @@ function TopicPublished() {
                     Ngày đăng: {topic.date.split("T")[0]}
                   </small>
                 </p>
-                {(auth.isCreator(UserProfile.getUserRole()) &&
-                  UserProfile.getUserId() === topic.userID) ||
-                auth.isAdmin(UserProfile.getUserRole()) ? (
+                {(auth.isCreator(Profile.getUserRole()) &&
+                  Profile.getUserId() === topic.userID) ||
+                auth.isAdmin(Profile.getUserRole()) ? (
                   <div className="d-flex ml-4 admin-options">
                     <Link
                       to={{
@@ -130,9 +123,9 @@ function TopicPublished() {
     axios
       .delete("/api/topics/" + id, {
         params: {
-          role: UserProfile.getUserRole(),
+          role: Profile.getUserRole(),
           userID: userID,
-          userIDDelete: UserProfile.getUserId(),
+          userIDDelete: Profile.getUserId(),
         },
       })
       .then((response) => {
