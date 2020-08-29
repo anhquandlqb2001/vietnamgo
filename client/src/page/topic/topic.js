@@ -8,6 +8,7 @@ import "./topic.css";
 // import auth from "../../js/auth";
 import Profile from "../../js/UserProfile";
 import ReactPaginate from "react-paginate";
+import auth from "../../js/auth";
 const ReactMarkdown = require("react-markdown");
 
 mapboxgl.accessToken =
@@ -167,11 +168,22 @@ function Topic(props) {
     } else {
       document.getElementById("commentTextA").value = "";
 
-      axios.put("/api/topics/" + props.match.params.id + "/comments", {text: newComment}).then((res) => {
-        if (res.data.success) {
-          setDataComments([res.data.newComment, ...DataComments]);
-        }
-      });
+      axios
+        .put("/api/topics/" + props.match.params.id + "/comments", {
+          text: newComment,
+        })
+        .then((res) => {
+          if (res.data.success) {
+            setDataComments([res.data.newComment, ...DataComments]);
+          }
+        })
+        .catch((e) => {
+          if (e.response.status === 403) {
+            auth.logout(() => {
+              window.location = "/login";
+            });
+          }
+        });
     }
   };
 
@@ -182,14 +194,23 @@ function Topic(props) {
     }
     const data = {
       userID: Profile.getUserId(),
-      role: Profile.getUserRole()
+      role: Profile.getUserRole(),
     };
-    axios.put("/api/topics/" + props.match.params.id + "/like", data).then((res) => {
-      if (res.data.success) {
-        setLike(!like);
-        setCountLike(res.data.countLike);
-      }
-    });
+    axios
+      .put("/api/topics/" + props.match.params.id + "/like", data)
+      .then((res) => {
+        if (res.data.success) {
+          setLike(!like);
+          setCountLike(res.data.countLike);
+        }
+      })
+      .catch((e) => {
+        if (e.response.status === 403) {
+          auth.logout(() => {
+            window.location = "/login";
+          });
+        }
+      });
   };
 
   return (

@@ -23,13 +23,6 @@ const Home = () => {
     });
   }, []);
 
-  useEffect(() => {
-    axios
-      .get("/api/auth/test")
-      .then((res) => console.log(res))
-      .catch((e) => AUTHENTICATE_ERROR(e.response.status));
-  });
-
   const onSubmit = (e) => {
     e.preventDefault();
     axios

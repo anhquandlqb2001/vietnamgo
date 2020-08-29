@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import data from "../../js/tinh-tp.json";
 import axios from "axios";
 import "./topic.css";
-import Profile from "../../js/UserProfile";
+import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
 const items = [];
 
 for (const key in data) {
@@ -19,33 +19,31 @@ const EditTopic = (props) => {
   const [Coor, setCoor] = useState([0, 0]);
   const [File, setFile] = useState([]);
   const [OldImg, setOldImg] = useState([]);
-  const [UserID, setUserID] = useState("");
 
   useEffect(() => {
     axios
       .get("/api/topics/edit/" + props.match.params.id)
       .then((res) => {
+        console.log(res.data);
         if (!res.data.success) {
           return props.history.push("/");
         } else {
-          setTitle(res.data.title);
-          setDescription(res.data.description);
-          setBody(res.data.body);
-          setAddress_Pri(res.data.address_pri);
-          setAddress_Sec(res.data.address_sec);
-          setCoor(res.data.coor);
-          setOldImg(res.data.imageURL);
+          setTitle(res.data.topic.title);
+          setDescription(res.data.topic.description);
+          setBody(res.data.topic.body);
+          setAddress_Pri(res.data.topic.address_pri);
+          setAddress_Sec(res.data.topic.address_sec);
+          setCoor(res.data.topic.coor);
+          setOldImg(res.data.topic.imageURL);
         }
       })
       .catch((e) => {
-        console.log("aa");
-        // if (e.response.status === 403) {
-        // }
+        AUTHENTICATE_ERROR(e.response.status)
       });
 
-    // axios.get("/api/location").then((res) => {
-    //   setAddress(res.data);
-    // });
+    axios.get("/api/location").then((res) => {
+      setAddress(res.data);
+    });
   }, []);
 
   const onSubmit = (e) => {

@@ -5,6 +5,7 @@ import ReactPaginate from "react-paginate";
 import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
+import {AUTHENTICATE_ERROR} from '../../js/errorhandler'
 import "../style.css";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
@@ -25,6 +26,7 @@ const Topics = (props) => {
   const search = window.location.search.substring(1);
   const [searchAddress, setSearchAddress] = useState(search.split("&")[0]);
   const [sortTitle, setSortTitle] = useState("Bài viết mới");
+
   const mapContainer = useRef(null);
 
   useEffect(() => {
@@ -82,21 +84,21 @@ const Topics = (props) => {
     switch (sortOption) {
       case "date":
         setTopics(
-          Topics.sort((a, b) => {
+          Data.sort((a, b) => {
             return new Date(b.createdAt) - new Date(a.createdAt);
           })
         );
         break;
       case "watch":
         setTopics(
-          Topics.sort((a, b) => {
+          Data.sort((a, b) => {
             return b.watched - a.watched;
           })
         );
         break;
       case "like":
         setTopics(
-          Topics.sort((a, b) => {
+          Data.sort((a, b) => {
             return b.like.length - a.like.length;
           })
         );
@@ -120,6 +122,7 @@ const Topics = (props) => {
     axios
       .get(`/api/topics/search?${searchAddress}`)
       .then((res) => {
+        console.log(res.data)
         if (res.data.success) {
           const data = res.data.result;
           setData(data);
@@ -224,18 +227,11 @@ const Topics = (props) => {
 
   const deleteTopic = (id, userID) => {
     axios
-      .delete("/api/topics/" + id, {
-        params: {
-          role: Profile.getUserRole(),
-          userID: userID,
-          userIDDelete: Profile.getUserId(),
-        },
-      })
+      .delete("/api/topics/" + id)
       .then((response) => {
-        console.log(response.data);
-      });
+        setTopics(Topics.filter((el) => el._id !== id));
+      }).catch(e => AUTHENTICATE_ERROR(e.response.status));
 
-    setTopics(Topics.filter((el) => el._id !== id));
   };
 
   const changeLocation = (coor, id) => {

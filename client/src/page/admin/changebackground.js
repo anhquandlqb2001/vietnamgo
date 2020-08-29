@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
 
 const ChangeBackground = () => {
   const [Data, setData] = useState([]);
@@ -63,7 +64,7 @@ const ChangeBackground = () => {
       } else {
         alert("Cap nhat background that bai");
       }
-    });
+    }).catch(e => AUTHENTICATE_ERROR(e.response.status));
   };
   return (
     <div className="container">

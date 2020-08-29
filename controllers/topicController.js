@@ -1,4 +1,3 @@
-const UserModel = require("../models/user.models");
 const TopicModel = require("../models/topic.models");
 const LocationModel = require("../models/location.models");
 const cloudinary = require("cloudinary").v2.api;
@@ -43,7 +42,6 @@ class TopicController {
     }
   }
 
-  
   topics_search_get(req, res) {
     TopicModel.find(
       { status: "published", address_pri: req.query.address },
@@ -80,29 +78,45 @@ class TopicController {
   }
 
   topics_user_published_get(req, res) {
-    TopicModel.find({ userID: req.user.userID, status: "published" }, (e, result) => {
-      res.json({ status: true, result });
-    });
+    TopicModel.find(
+      { userID: req.user.userID, status: "published" },
+      (e, result) => {
+        res.json({ status: true, result });
+      }
+    );
   }
 
-  
-  topics_details_published_data_get(req, res) {
-    TopicModel.findById(req.params.id, (err, result) => {
-      if (err) {
-        return res.json({ success: false, err });
-      }
-      if (result.status === "queue" && req.query.role !== "admin") {
-        return res.json({ success: false });
-      }
+  async topics_details_published_data_get(req, res) {
+    try {
+      const topic = await TopicModel.findById(
+        req.params.id,
+        async (err, result) => {
+          if (err) {
+            return res.json({ success: false, err });
+          }
+          if (result.status === "queue" && req.query.role !== "admin") {
+            return res.json({ success: false });
+          }
 
-      result.comments.sort(function (a, b) {
-        return new Date(b.time) - new Date(a.time);
-      });
-      if (result.like.includes(req.query.userID)) {
-        result = { ...result._doc, liked: true };
-      }
-      return res.json({ success: true, result });
-    });
+          const location = await LocationModel.findOne({
+            address: result.address_pri,
+          });
+          location.totalWatch += 1;
+          await location.save();
+
+          result.comments.sort(function (a, b) {
+            return new Date(b.time) - new Date(a.time);
+          });
+          if (result.like.includes(req.query.userID)) {
+            result = { ...result._doc, liked: true };
+          }
+          return res.json({ success: true, result });
+        }
+      );
+
+      topic.watched += 1;
+      await topic.save();
+    } catch (error) {}
   }
 
   async topics_details_likeAction_put(req, res) {
@@ -112,15 +126,21 @@ class TopicController {
       if (topic.status === "queue") {
         return res.json({ success: false });
       }
+      const location = await LocationModel.findOne({
+        address: topic.address_pri,
+      });
       if (!topic.like.includes(req.user.userID)) {
         topic.like = [...topic.like, req.user.userID];
+        location.totalLike += 1
       } else {
         const index = topic.like.indexOf(req.user.userID);
         if (index > -1) {
           topic.like.splice(index, 1);
+          location.totalLike -= 1
         }
       }
       await topic.save();
+      await location.save()
       return res.json({ success: true, countLike: topic.like.length });
     } catch (error) {
       console.log(error);
@@ -149,6 +169,10 @@ class TopicController {
   async topics_details_delete(req, res) {
     try {
       const topic = await TopicModel.findById(req.params.id);
+      const location = await LocationModel.findOne({ address: topic.address_pri });
+      location.totalWatch -= topic.watched;
+      location.totalLike -= topic.like.length;
+      await location.save();
       removeImageOnCloud(
         topic.imageURL.map((img) => {
           return img.id;
@@ -158,29 +182,31 @@ class TopicController {
       res.json({ success: true, message: `Deleted ${req.params.id}` });
     } catch (e) {
       res.json({ success: false, e });
+      console.log(e)
     }
   }
 
   async topics_details_edit_get(req, res) {
     try {
       const topic = await TopicModel.findById(req.params.id);
-      res.json(topic);
+      res.json({ success: true, topic });
     } catch (error) {}
   }
 
   topics_permission(req, res, next) {
-    if (req.user.role == "admin") {
+    console.log(req.user);
+    if (req.user.role === "admin") {
       return next();
     } else if (req.user.role === "creator") {
       TopicModel.findById(req.params.id, (err, result) => {
         if (err) return res.status(404);
         if (req.user.userID === result.userID) {
-          return next()
+          return next();
         }
-        return res.json({success: false})
+        return res.json({ success: false });
       });
     } else {
-      return res.status(403)
+      return res.status(403);
     }
   }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import data from "../../js/tinh-tp.json";
 import axios from "axios";
 import Profile from "../../js/UserProfile";
+import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
 const items = [];
 
 for (const key in data) {
@@ -57,7 +58,7 @@ const NewTopic = () => {
       } else {
         alert("Them bai viet that bai");
       }
-    });
+    }).catch(e => AUTHENTICATE_ERROR(e.response.status));
   };
 
   return (

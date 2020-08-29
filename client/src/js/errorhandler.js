@@ -1,9 +1,14 @@
-import auth  from "./auth";
+import auth from "./auth";
 export const AUTHENTICATE_ERROR = (status) => {
-  if (status === 401 || status === 403) {
-    localStorage.clear();
-    auth.logout(() => {
-      // window.location = "/login";
-    });
+  switch (status) {
+    case 401:
+      auth.logout(() => {
+        window.location = "/login";
+      });
+      break;
+    case 403:
+      window.location = "/";
+    default:
+      break;
   }
 };

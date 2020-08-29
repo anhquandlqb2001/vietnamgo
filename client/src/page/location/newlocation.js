@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import data from '../../js/tinh-tp.json'
 import axios from 'axios'
+import {AUTHENTICATE_ERROR} from '../../js/errorhandler'
 const items = []
 
 for (const key in data) {
@@ -25,7 +26,7 @@ const [Image, setImage] = useState(null)
         } else {
           alert(res.data.message)
         }
-      })
+      }).catch(e => AUTHENTICATE_ERROR(e.response.status))
   }
 
     return (

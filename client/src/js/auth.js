@@ -5,12 +5,12 @@ class Auth {
   }
 
   login(cb) {
-    
     this.authenticated = true;
     cb();
   }
 
   logout(cb) {
+    localStorage.clear()
     this.authenticated = false;
     cb();
   }

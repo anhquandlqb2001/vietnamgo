@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import auth from "../../js/auth";
+import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
 
 const UserControl = (props) => {
   const [users, setUsers] = useState([]);
@@ -14,7 +15,7 @@ const UserControl = (props) => {
   const getUserData = () => {
     axios.get("/api/user").then((res) => {
       setUsers(res.data);
-    });
+    }).catch(e => AUTHENTICATE_ERROR(e.response.status));
   };
 
   useEffect(() => {
@@ -102,14 +103,13 @@ const UserControl = (props) => {
 
   const roleUp = (id) => {
     axios.put("/api/user/" + id + "/up").then((res) => {
-      
       if (res.data.success) {
         setUsers([
           ...users.filter((user) => user._id !== id),
           { ...users.find((user) => user._id === id), role: "creator" },
         ]);
       }
-    });
+    }).catch(e => AUTHENTICATE_ERROR(e.response.status));
   };
 
   const roleDown = (id) => {
@@ -120,7 +120,7 @@ const UserControl = (props) => {
           { ...users.find((user) => user._id === id), role: "customer" },
         ]);
       }
-    });
+    }).catch(e => AUTHENTICATE_ERROR(e.response.status));
   };
 
   return <ul className="list-group container">{userData}</ul>;

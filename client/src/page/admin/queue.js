@@ -4,6 +4,7 @@ import axios from "axios";
 import ReactPaginate from "react-paginate";
 import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
+import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
 
 const Queue = () => {
   const [Topics, setTopics] = useState([]);
@@ -19,17 +20,15 @@ const Queue = () => {
   }, [currentPage]);
 
   const getTopics = () => {
-    axios
-      .get(`/api/topics/queue/data`)
-      .then((res) => {
-        if (res.data.success) {
-          const data = res.data.result;
-          const slice = data.slice(offset, offset + perPage);
-          setTopics(slice);
-          setperPage(10);
-          setPageCount(Math.ceil(data.length / perPage));
-        }
-      });
+    axios.get(`/api/topics/queue/data`).then((res) => {
+      if (res.data.success) {
+        const data = res.data.result;
+        const slice = data.slice(offset, offset + perPage);
+        setTopics(slice);
+        setperPage(10);
+        setPageCount(Math.ceil(data.length / perPage));
+      }
+    }).catch(e => AUTHENTICATE_ERROR(e.response.status));
   };
 
   const handlePageClick = (e) => {
@@ -158,15 +157,19 @@ const Queue = () => {
       })
       .then((response) => {
         console.log(response.data);
-      });
+      })
+      .catch((e) => AUTHENTICATE_ERROR(e.response.status));
 
     setTopics(Topics.filter((el) => el._id !== id));
   };
 
   const accept = (id) => {
-    axios.put("/api/topics/accept/" + id).then((res) => {
-      res.data.success && setTopics(Topics.filter((el) => el._id !== id));
-    });
+    axios
+      .put("/api/topics/accept/" + id)
+      .then((res) => {
+        res.data.success && setTopics(Topics.filter((el) => el._id !== id));
+      })
+      .catch((e) => AUTHENTICATE_ERROR(e.response.status));
   };
 
   return (

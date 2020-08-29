@@ -5,7 +5,7 @@ import ReactPaginate from "react-paginate";
 import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import {AUTHENTICATE_ERROR} from '../../js/errorhandler'
 import "../style.css";
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
@@ -22,10 +22,10 @@ const Topics = (props) => {
   const [map, setMap] = useState(null);
   const [windowWidth, setWindowWidth] = useState(0);
   const [currentStyle, setCurrentStyle] = useState(null);
-  const [sortOption, setSortOption] = useState(
-    history.location.search.split("=")[1]
-  );
-  const [sortTitle, setSortTitle] = useState("Theo ngày đăng");
+  const [sortOption, setSortOption] = useState(null);
+  const search = window.location.search.substring(1);
+  const [searchAddress, setSearchAddress] = useState(search.split("&")[0]);
+  const [sortTitle, setSortTitle] = useState("Bài viết mới");
 
   const mapContainer = useRef(null);
 
@@ -46,16 +46,6 @@ const Topics = (props) => {
     if (!map) initializeMap({ setMap, mapContainer });
   }, [map]);
 
-  const updateDimensions = () => {
-    let width = typeof window !== "undefined" ? window.innerWidth : 0;
-    setWindowWidth(width);
-    if (windowWidth < 576) {
-      setCurrentStyle(styleMobile);
-    } else {
-      setCurrentStyle(null);
-    }
-  };
-
   useEffect(() => {
     getData();
     updateDimensions();
@@ -67,41 +57,17 @@ const Topics = (props) => {
   }, [currentPage]);
 
   useEffect(() => {
-    switch (sortOption) {
-      case "date":
-        setTopics(
-          Topics.sort((a, b) => {
-            return new Date(b.createdAt) - new Date(a.createdAt);
-          })
-        );
-        break;
-      case "watch":
-        setTopics(
-          Topics.sort((a, b) => {
-            return b.watched - a.watched;
-          })
-        );
-        break;
-      case "like":
-        setTopics(
-          Topics.sort((a, b) => {
-            return b.like.length - a.like.length;
-          })
-        );
-        break;
-      default:
-        break;
-    }
-
+    sortTopics(sortOption)
+    
     if (sortOption) {
       history.push({
         pathname: `/topics`,
-        search: `sortby=${sortOption}`,
+        search: `&sortby=${sortOption}`,
       });
     }
 
     [
-      { id: "date", title: "Bài mới nhất" },
+      { id: "date", title: "Bài viết mới" },
       { id: "like", title: "Theo lượt thích" },
       { id: "watch", title: "Theo lượt xem" },
     ].map((item) => {
@@ -114,16 +80,57 @@ const Topics = (props) => {
     });
   }, [sortOption]);
 
+  const sortTopics = sortOption => {
+    switch (sortOption) {
+      case "date":
+        setTopics(
+          Data.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          })
+        );
+        break;
+      case "watch":
+        setTopics(
+          Data.sort((a, b) => {
+            return b.watched - a.watched;
+          })
+        );
+        break;
+      case "like":
+        setTopics(
+          Data.sort((a, b) => {
+            return b.like.length - a.like.length;
+          })
+        );
+        break;
+      default:
+        break;
+    }
+  }
+
+  const updateDimensions = () => {
+    let width = typeof window !== "undefined" ? window.innerWidth : 0;
+    setWindowWidth(width);
+    if (windowWidth < 576) {
+      setCurrentStyle(styleMobile);
+    } else {
+      setCurrentStyle(null);
+    }
+  };
+
   const getData = () => {
-    axios.get(`/api/topics`).then((res) => {
-      if (res.data.success) {
-        const data = res.data.result;
-        setData(data);
-        const slice = data.slice(offset, offset + perPage);
-        setTopics(slice);
-        setPageCount(Math.ceil(data.length / perPage));
-      }
-    });
+    axios
+      .get(`/api/topics`)
+      .then((res) => {
+        if (res.data.success) {
+          const data = res.data.result;
+          setData(data);
+          const slice = data.slice(offset, offset + perPage);
+          setTopics(slice);
+          setSortOption("date")
+          setPageCount(Math.ceil(data.length / perPage));
+        }
+      });
   };
 
   const getTopics = () => {
@@ -131,6 +138,7 @@ const Topics = (props) => {
     setTopics(slice);
     setPageCount(Math.ceil(Data.length / perPage));
   };
+
 
   const handlePageClick = (e) => {
     const selectedPage = e.selected;
@@ -154,7 +162,7 @@ const Topics = (props) => {
           <div className="col-md-4 col-4">
             <Link to={`/topics/${topic._id}`}>
               <img
-                src={topic.imageURL[0].url}
+                src={`${topic.imageURL[0].url}`}
                 alt="img"
                 className="card-img"
                 style={currentStyle}
@@ -218,18 +226,11 @@ const Topics = (props) => {
 
   const deleteTopic = (id, userID) => {
     axios
-      .delete("/api/topics/" + id, {
-        params: {
-          role: Profile.getUserRole(),
-          userID: userID,
-          userIDDelete: Profile.getUserId(),
-        },
-      })
+      .delete("/api/topics/" + id)
       .then((response) => {
-        console.log(response.data);
-      });
+        setTopics(Topics.filter((el) => el._id !== id));
+      }).catch(e => AUTHENTICATE_ERROR(e.response.status));
 
-    setTopics(Topics.filter((el) => el._id !== id));
   };
 
   const changeLocation = (coor, id) => {
@@ -247,7 +248,7 @@ const Topics = (props) => {
     <div>
       {/* Sort by */}
       <div className="row mx-2">
-        <div className="dropdown mb-2 col-12">
+        <div className="dropdown col-12">
           <button
             className="btn border border-success dropdown-toggle"
             type="button"
@@ -257,19 +258,15 @@ const Topics = (props) => {
             aria-expanded="false"
             id="sort-title"
           >
-            Bài mới nhất
+            {sortTitle}
           </button>
           <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a
               className="dropdown-item"
               onClick={() => {
                 setSortOption("date");
-                setSortTitle("Theo ngày đăng");
+                setSortTitle("Bài viết mới");
               }}
-              // onMouseOver={(e) => {
-              //   e.target.classList.add('active')
-              //   onmouseout=((eve) => {eve.target.classList.remove('active')})
-              // }}
               id="date"
             >
               Bài viết mới
