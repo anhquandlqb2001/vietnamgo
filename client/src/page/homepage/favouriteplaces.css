@@ -1,0 +1,16 @@
+.favour_place-container {
+  /* border: 1px solid black; */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.favouritePlace_address {
+  font-size: 1.3em;
+  margin-bottom: 0.3rem;
+}
+
+@media only screen and (min-width: 576px) {
+  .favour_place-container {
+    margin: 0 auto;
+  }
+}

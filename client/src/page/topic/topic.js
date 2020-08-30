@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import "./topic.css";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./topic.css";
-// import auth from "../../js/auth";
 import Profile from "../../js/UserProfile";
 import ReactPaginate from "react-paginate";
 import auth from "../../js/auth";
@@ -110,12 +108,12 @@ function Topic(props) {
       <img
         data-toggle="modal"
         data-target="#exampleModal"
-        src={img.url}
-        value={img.url}
+        src={img.main}
+        value={img.main}
         onClick={() => zoomImg(img.url)}
         className="card-img mb-md-2"
         id="img-item"
-        style={{ marginBottom: margin }}
+        style={{ marginBottom: margin, width: '100%', height: 'auto', objectFit: 'cover' }}
         key={index}
       />
     );
@@ -128,12 +126,10 @@ function Topic(props) {
   const imgThumb = () => {
     if (topic.imageURL != null)
       return (
-        <div
-          className="img-thumbnail"
-          style={{
-            backgroundImage: `url(${topic.imageURL[0].url})`,
-          }}
-        ></div>
+        <img
+        className="img-thumbnail"
+          src={topic.imageThumb ? topic.imageThumb.main : topic.imageURL[0].url}
+        ></img>
       );
   };
 
@@ -238,7 +234,7 @@ function Topic(props) {
           />
         </div>
       </div>
-      {imgThumb()}
+      <div>{imgThumb()}</div>
       <div className="container">
         <div className="row">
           <div className="jumbotron my-md-3 p-2 p-md-4 my-3 w-100">

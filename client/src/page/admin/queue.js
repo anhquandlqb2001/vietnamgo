@@ -68,7 +68,7 @@ const Queue = () => {
           <div className="col-md-4 col-4">
             <Link to={`/topics/${topic._id}`}>
               <img
-                src={`${topic.imageURL[0].url}`}
+                src={topic.imageURL[0].dashboard ? topic.imageURL[0].dashboard : topic.imageURL[0].main}
                 alt="img"
                 className="card-img"
                 style={currentStyle}

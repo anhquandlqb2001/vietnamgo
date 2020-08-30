@@ -3,36 +3,46 @@ import { Slide } from "react-slideshow-image";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { LazyImage } from "../../components/LazyImage";
+import "./favouritetopics.css";
+import Ticker from "react-ticker";
 
 const properties = {
   duration: 4000,
   transitionDuration: 500,
   infinite: true,
-  indicators: true,
-  arrows: true,
   pauseOnHover: true,
 };
 
 const SlideshowSlide = ({ imgURL, _id, topicTitle }) => {
   return (
     <div className="slide-container">
+      <Ticker speed={3} offset="2">
+        {({ index }) => (
+          <p
+            style={{
+              textOverflow: "hidden",
+              width: "600px",
+              marginBottom: "5px",
+              cursor: "pointer",
+            }}
+          >
+            {topicTitle}
+          </p>
+        )}
+      </Ticker>
       <Slide {...properties}>
         {imgURL.map((img, index) => {
           return (
             <Link to={`/topics/${_id}`} key={index}>
               <div className="each-slide">
-                <LazyImage src={img.url} styles={{height: "300px", backgroundSize: "cover"}}>
-                  <div
-                    style={{
-                      display: "table",
-                      height: "unset",
-                      width: "100%",
-                      backgroundColor: "rgba(0, 0, 0, 0.8)",
-                    }}
-                  >
-                    <span style={{}}>{topicTitle}</span>
-                  </div>
-                </LazyImage>
+                <LazyImage
+                  src={img.dashboard ? img.dashboard : img.url}
+                  styles={{
+                    height: "300px",
+                    backgroundSize: "cover",
+                    width: "100%",
+                  }}
+                ></LazyImage>
               </div>
             </Link>
           );
@@ -47,30 +57,16 @@ const FavouriteTopics = () => {
 
   useEffect(() => {
     axios.get("/api/topics/favourite").then((res) => {
-      console.log(res.data)
-      res.data.success && setData(res.data.result)
+      console.log(res.data);
+      res.data.success && setData(res.data.result);
     });
-
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
   }, []);
 
-  const updateDimensions = () => {
-    // let windowWidth = typeof window !== "undefined" ? window.innerWidth : 0;
-    // let windowHeight = typeof window !== "undefined" ? window.innerHeight : 0;
-    // this.setState({ windowWidth, windowHeight });
-    // if (this.state.windowWidth < 768) {
-    //   this.setState({ visibility: "none" });
-    // } else {
-    //   this.setState({ visibility: "block" });
-    // }
-  };
-
   return (
-    <div className="row">
+    <div className="row mb-md-4 favouriteTopic_container">
       {Data.map((topic, index) => {
         return (
-          <div className="col-md-4" key={index}>
+          <div className="col-md-4 " key={index}>
             <SlideshowSlide
               imgURL={topic.imageURL}
               topicTitle={topic.title}

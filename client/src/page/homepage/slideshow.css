@@ -1,0 +1,11 @@
+.carousel-container {
+  width: 100%;
+  position: relative;
+  height: 400px;
+}
+
+@media only screen and (min-width: 768px) {
+  .carousel-container {
+    height: 800px;
+  }
+}

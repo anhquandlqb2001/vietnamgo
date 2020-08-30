@@ -28,6 +28,7 @@
     "multer": "^1.4.2",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "react-ticker": "^1.2.2",
     "request": "^2.88.2"
   },
   "devDependencies": {

@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import "./style.homepage.css";
+import "./slideshow.css";
 import axios from "axios";
 
 const SlideItem = ({img, index}) => {
   if (index === 0) {
     return (
-      <div className="carousel-item active">
-        <img src={img.url} className="d-block w-100" alt="anh" />
+      <div className="carousel-item h-100 active">
+        <img src={img.main} className="d-block w-100 slideshow-img h-100" alt="anh" />
       </div>
     );
   }
   return (
-    <div className="carousel-item">
-      <img loading="lazy" src={img.url} className="d-block w-100" alt="anh" />
+    <div className="carousel-item h-100">
+      <img loading="lazy" src={img.main} className="d-block w-100 slideshow-img h-100" alt="anh" />
     </div>
   );
 };
@@ -22,7 +22,6 @@ const SlideShow = () => {
 
   useEffect(() => {
     axios.get("/api/slideimg").then((res) => {
-      console.log(res.data)
       if (res.data.success && res.data.length !== 0) {
         setImage(res.data.result[0].img)
       }
@@ -33,10 +32,10 @@ const SlideShow = () => {
       <div className="carousel-container">
         <div
           id="carouselExampleFade"
-          className="carousel slide carousel-fade"
+          className="carousel slide carousel-fade h-100"
           data-ride="carousel"
         >
-          <div className="carousel-inner">
+          <div className="carousel-inner h-100">
             {Image.map((img, index) => {
               return <SlideItem img={img} index={index} key={index}/>;
             })}

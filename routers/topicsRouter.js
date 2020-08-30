@@ -28,8 +28,9 @@ router.put(
   "/update/:id",
   verify_token,
   selfPermission,
-  upload.array("imgUpload"),
-  multerController.uploadMultipleFiles,
+  upload.fields([{name: "imgUpload"}, {name: "imgThumb"}]),
+  multerController.uploadTopicImage,
+  multerController.uploadSingleTopicThumb,
   topicController.topics_details_update_put
 );
 
@@ -55,8 +56,9 @@ router.post(
   "/add",
   verify_token,
   creatorPermission,
-  upload.array("imgUpload"),
-  multerController.uploadMultipleFiles,
+  upload.fields([{name: "imgUpload"}, {name: "imgThumb"}]),
+  multerController.uploadTopicImage,
+  multerController.uploadSingleTopicThumb,
   topicController.topics_add_post
 );
 

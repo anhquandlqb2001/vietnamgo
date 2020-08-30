@@ -13,7 +13,7 @@ router.post(
   adminPermission,
   upload.single("profile"),
   locationController.location_add_checkExist_post,
-  multerController.uploadSingleFile,
+  multerController.uploadSingleLocationImage,
   locationController.location_add_post
 );
 

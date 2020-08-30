@@ -18,6 +18,7 @@ const NewTopic = () => {
   const [Address, setAddress] = useState([]);
   const [Coor, setCoor] = useState([0, 0]);
   const [File, setFile] = useState([]);
+  const [Thumb, setThumb] = useState(null)
 
   useEffect(() => {
     axios.get("/api/location").then((res) => {
@@ -44,6 +45,7 @@ const NewTopic = () => {
     formData.append("coory", Coor[1]);
     formData.append("id", Profile.getUserId());
     formData.append("author", Profile.getUsername())
+    formData.append("imgThumb", Thumb)
 
     const config = {
       headers: {
@@ -127,7 +129,7 @@ const NewTopic = () => {
         </div>
         <div className="form-row">
           <div className="form-group col-md-3">
-            <label>Toạ độ: Coor-x</label>
+            <label>Toạ độ: Coor-x (&gt;90)</label>
             <input
               type="text"
               className="form-control"
@@ -137,7 +139,7 @@ const NewTopic = () => {
             />
           </div>
           <div className="form-group col-md-3">
-            <label>Coor-y</label>
+            <label>Coor-y (&lt;90)</label>
             <input
               type="text"
               className="form-control"
@@ -154,7 +156,7 @@ const NewTopic = () => {
               onChange={(e) => {
                 if (e.target.value.split('@')[1]) {
                   if (e.target.value.split('@')[1].split(',')[0] && e.target.value.split('@')[1].split(',')[1]) {
-                    setCoor([e.target.value.split('@')[1].split(',')[0], e.target.value.split('@')[1].split(',')[1]])
+                    setCoor([e.target.value.split('@')[1].split(',')[1], e.target.value.split('@')[1].split(',')[0]])
                   }
                 }
               }}
@@ -184,6 +186,16 @@ const NewTopic = () => {
                   );
                 })}
             </div>
+          </div>
+          <div className="form-group">
+            <label>Chọn ảnh background</label>
+            <input
+              type="file"
+              name="imgThumb"
+              className="form-control-file"
+              id="imgThumb"
+              onChange={(e) => setThumb(e.target.files[0])}
+            />
           </div>
         </div>
         <button type="submit" className="btn btn-primary px-4">

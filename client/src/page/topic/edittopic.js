@@ -19,6 +19,7 @@ const EditTopic = (props) => {
   const [Coor, setCoor] = useState([0, 0]);
   const [File, setFile] = useState([]);
   const [OldImg, setOldImg] = useState([]);
+  const [Thumb, setThumb] = useState(null)
 
   useEffect(() => {
     axios
@@ -62,6 +63,7 @@ const EditTopic = (props) => {
     formData.append("date", new Date());
     formData.append("coorx", Coor[0]);
     formData.append("coory", Coor[1]);
+    formData.append("imgThumb", Thumb)
 
     const config = {
       headers: {
@@ -72,6 +74,7 @@ const EditTopic = (props) => {
     axios
       .put("/api/topics/update/" + props.match.params.id, formData, config)
       .then((res) => {
+        console.log(res.data)
         if (res.data.success) {
           alert(res.data.message);
           return (window.location = "/topics/" + props.match.params.id);
@@ -146,7 +149,7 @@ const EditTopic = (props) => {
         </div>
         <div className="form-row">
           <div className="form-group col-md-3">
-            <label>Toạ độ: Coor-x</label>
+            <label>Toạ độ: Coor-x (&gt;90)</label>
             <input
               type="text"
               className="form-control"
@@ -156,7 +159,7 @@ const EditTopic = (props) => {
             />
           </div>
           <div className="form-group col-md-3">
-            <label>Coor-y</label>
+            <label>Coor-y (&lt; 90)</label>
             <input
               type="text"
               className="form-control"
@@ -177,8 +180,8 @@ const EditTopic = (props) => {
                     e.target.value.split("@")[1].split(",")[1]
                   ) {
                     setCoor([
-                      e.target.value.split("@")[1].split(",")[0],
                       e.target.value.split("@")[1].split(",")[1],
+                      e.target.value.split("@")[1].split(",")[0],
                     ]);
                   }
                 }
@@ -219,6 +222,16 @@ const EditTopic = (props) => {
                   })}
             </div>
           </div>
+          <div className="form-group">
+            <label>Chọn ảnh background</label>
+            <input
+              type="file"
+              name="imgThumb"
+              className="form-control-file"
+              id="imgUpload"
+              onChange={(e) => setThumb(e.target.files[0])}
+            />
+            </div>
         </div>
         <button type="submit" className="btn btn-primary px-4">
           Lưu

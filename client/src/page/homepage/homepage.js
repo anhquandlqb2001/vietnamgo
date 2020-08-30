@@ -7,7 +7,6 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Profile from "../../js/UserProfile";
-import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
 
 axios.defaults.headers.common[
   "authorization"
@@ -82,9 +81,10 @@ const Home = () => {
       <div className="container">
         <FavourPlace />
 
-        <h2 style={{ textAlign: "center" }}>Các địa điểm yêu thích</h2>
+        <h2 style={{ textAlign: "center" }} className="my-5">
+          Các địa điểm yêu thích
+        </h2>
         <FavouriteTopics />
-        {/* <PlacesAround /> */}
       </div>
     </div>
   );

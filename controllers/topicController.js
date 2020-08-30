@@ -68,6 +68,7 @@ class TopicController {
         userID: req.body.id,
         author: req.body.author,
         comments: [],
+        imageThumb: req.imageDetails
       });
 
       const topic = await newTopic.save();
@@ -173,11 +174,17 @@ class TopicController {
       location.totalWatch -= topic.watched;
       location.totalLike -= topic.like.length;
       await location.save();
+
       removeImageOnCloud(
         topic.imageURL.map((img) => {
           return img.id;
         })
       );
+
+      removeImageOnCloud(
+        topic.imageThumb.id
+      );
+
       await topic.remove();
       res.json({ success: true, message: `Deleted ${req.params.id}` });
     } catch (e) {
@@ -234,7 +241,7 @@ class TopicController {
       topic.coor = [req.body.coorx, req.body.coory];
       topic.description = req.body.description;
       topic.body = req.body.body;
-      if (req.imageArray.length > 0) {
+      if (req.imageArray && req.imageArray.length > 0) {
         removeImageOnCloud(
           topic.imageURL.map((img) => {
             return img.id;
@@ -243,10 +250,18 @@ class TopicController {
         topic.imageURL = req.imageArray;
       }
 
+      if (req.imageDetails) {
+        removeImageOnCloud(
+          topic.imageThumb.id
+        );
+        topic.imageThumb = req.imageDetails
+      }
+
       await topic.save();
       return res.json({ success: true, message: "Cap nhat thanh cong" });
     } catch (error) {
-      res.json({ success: false, error });
+      console.log(error)
+      res.json({ success: false, error: "asd" });
     }
   }
 }

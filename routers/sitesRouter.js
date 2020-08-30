@@ -12,7 +12,7 @@ router.post(
   auth_token,
   adminPermission,
   upload.array("slide-img"),
-  multerController.uploadMultipleFiles,
+  multerController.uploadMultipleBackgroundImages,
   siteController.site_slideImage_post
 );
 

@@ -7,21 +7,37 @@ cloudinary.config({
 });
 
 const self = (module.exports = {
-  uploadSingle: (file) => {
+  uploadLocationImage: (file) => {
     return new Promise((resolve) => {
       cloudinary.uploader
         .upload(file, {
-          folder: "others",
+          folder: "locations",
         })
         .then((result) => {
           resolve({
             url: result.secure_url,
-            id: result.public_id
+            id: result.public_id,
+            main: self.reSizeImage(result.public_id, 380, 280),
           });
         });
     });
   },
-  uploadMultiple: (file) => {
+  uploadTopicThumb: (file) => {
+    return new Promise((resolve) => {
+      cloudinary.uploader
+        .upload(file, {
+          folder: "thumb",
+        })
+        .then((result) => {
+          resolve({
+            url: result.secure_url,
+            id: result.public_id,
+            main: self.reSizeImage(result.public_id, 800, 1900),
+          });
+        });
+    });
+  },
+  uploadTopicImages: (file) => {
     return new Promise((resolve) => {
       cloudinary.uploader
         .upload(file, {
@@ -32,9 +48,26 @@ const self = (module.exports = {
             resolve({
               url: result.secure_url,
               id: result.public_id,
-              thumb1: self.reSizeImage(result.public_id, 200, 200),
               main: self.reSizeImage(result.public_id, 500, 500),
-              thumb2: self.reSizeImage(result.public_id, 300, 300),
+              dashboard: self.reSizeImage(result.public_id, 300, 350)
+            });
+          }
+        });
+    });
+  },
+
+  uploadBackgroundImages: (file) => {
+    return new Promise((resolve) => {
+      cloudinary.uploader
+        .upload(file, {
+          folder: "backgrounds",
+        })
+        .then((result) => {
+          if (result) {
+            resolve({
+              url: result.secure_url,
+              id: result.public_id,
+              main: self.reSizeImage(result.public_id, 720, 1600),
             });
           }
         });

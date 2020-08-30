@@ -29,6 +29,9 @@ const topicSchema = new mongoose.Schema({
   imageURL: {
     type: []
   },
+  imageThumb: {
+    type: Object
+  },
   coor: {
     type: []
   },

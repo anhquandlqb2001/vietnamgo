@@ -5,8 +5,10 @@ import ReactPaginate from "react-paginate";
 import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
-import {AUTHENTICATE_ERROR} from '../../js/errorhandler'
-import "../style.css";
+import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
+// import "../style.css";
+import "./topics.css";
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
 
@@ -20,11 +22,7 @@ const Topics = (props) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [coor, setCoor] = useState([108.2772, 14.0583]);
   const [map, setMap] = useState(null);
-  const [windowWidth, setWindowWidth] = useState(0);
-  const [currentStyle, setCurrentStyle] = useState(null);
   const [sortOption, setSortOption] = useState(null);
-  const search = window.location.search.substring(1);
-  const [searchAddress, setSearchAddress] = useState(search.split("&")[0]);
   const [sortTitle, setSortTitle] = useState("Bài viết mới");
 
   const mapContainer = useRef(null);
@@ -48,8 +46,6 @@ const Topics = (props) => {
 
   useEffect(() => {
     getData();
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
   }, []);
 
   useEffect(() => {
@@ -57,8 +53,8 @@ const Topics = (props) => {
   }, [currentPage]);
 
   useEffect(() => {
-    sortTopics(sortOption)
-    
+    sortTopics(sortOption);
+
     if (sortOption) {
       history.push({
         pathname: `/topics`,
@@ -80,7 +76,7 @@ const Topics = (props) => {
     });
   }, [sortOption]);
 
-  const sortTopics = sortOption => {
+  const sortTopics = (sortOption) => {
     switch (sortOption) {
       case "date":
         setTopics(
@@ -106,31 +102,19 @@ const Topics = (props) => {
       default:
         break;
     }
-  }
-
-  const updateDimensions = () => {
-    let width = typeof window !== "undefined" ? window.innerWidth : 0;
-    setWindowWidth(width);
-    if (windowWidth < 576) {
-      setCurrentStyle(styleMobile);
-    } else {
-      setCurrentStyle(null);
-    }
   };
 
   const getData = () => {
-    axios
-      .get(`/api/topics`)
-      .then((res) => {
-        if (res.data.success) {
-          const data = res.data.result;
-          setData(data);
-          const slice = data.slice(offset, offset + perPage);
-          setTopics(slice);
-          setSortOption("date")
-          setPageCount(Math.ceil(data.length / perPage));
-        }
-      });
+    axios.get(`/api/topics`).then((res) => {
+      if (res.data.success) {
+        const data = res.data.result;
+        setData(data);
+        const slice = data.slice(offset, offset + perPage);
+        setTopics(slice);
+        setSortOption("date");
+        setPageCount(Math.ceil(data.length / perPage));
+      }
+    });
   };
 
   const getTopics = () => {
@@ -139,7 +123,6 @@ const Topics = (props) => {
     setPageCount(Math.ceil(Data.length / perPage));
   };
 
-
   const handlePageClick = (e) => {
     const selectedPage = e.selected;
     const offset = selectedPage * perPage;
@@ -147,77 +130,72 @@ const Topics = (props) => {
     setoffset(offset);
   };
 
-  const styleMobile = {
-    height: "180px",
-  };
-
   const postData = Topics.map((topic, index) => {
     return (
       <div
         className="card mb-3 card-child-container overflow-hidden"
-        style={currentStyle}
         key={index}
       >
-        <div className="row no-gutters">
-          <div className="col-md-4 col-4">
+        <div className="topic_image_container">
+          <Link to={`/topics/${topic._id}`}>
+            <img
+              src={topic.imageURL[0].dashboard ? topic.imageURL[0].dashboard : topic.imageURL[0].main}
+              alt="img"
+              className="card-img"
+              loading="lazy"
+            />
+          </Link>
+        </div>
+        <div
+          id={topic._id}
+          className="topic_details_container"
+          onClick={() => {
+            changeLocation(topic.coor, topic._id);
+          }}
+        >
+          <div className="card-body p-1">
             <Link to={`/topics/${topic._id}`}>
-              <img
-                src={`${topic.imageURL[0].url}`}
-                alt="img"
-                className="card-img"
-                style={currentStyle}
-              />
+              <h5 className="topic_title card-title mb-1">{topic.title}</h5>
             </Link>
-          </div>
-          <div
-            className="col-md-8 col-8 card-right h-100"
-            id={topic._id}
-            onClick={() => {
-              changeLocation(topic.coor, topic._id);
-            }}
-          >
-            <div className="card-body p-1">
-              <Link to={`/topics/${topic._id}`}>
-                <h5 className="card-title mb-1">{topic.title}</h5>
-              </Link>
-              <p className="card-text description m-0">{topic.description}</p>
-              <div className="mt-md-4">
-                <p className="card-text m-0">
-                  <small className="text-muted">
-                    Ngày đăng: {topic.date.split("T")[0]}
-                  </small>
-                </p>
-                {(auth.isCreator(Profile.getUserRole()) &&
-                  Profile.getUserId() === topic.userID) ||
-                auth.isAdmin(Profile.getUserRole()) ? (
-                  <div className="d-flex admin-options">
-                    <Link
-                      to={{
-                        pathname: `/topics/edit/${topic._id}`,
-                        state: {
-                          userID: topic.userID,
-                        },
-                      }}
-                      className="btn btn-sm btn-warning mr-2"
-                    >
-                      Chỉnh sửa
-                    </Link>
-                    <p
-                      href="#"
-                      onClick={() => {
-                        deleteTopic(topic._id, topic.userID);
-                      }}
-                      className="btn btn-sm btn-danger m-0"
-                    >
-                      Xoá
-                    </p>
-                  </div>
-                ) : (
-                  ""
-                )}
-              </div>
-              <div></div>
+            <p className="card-text topic-description m-0">
+              {topic.description}
+            </p>
+            <div className="mt-md-1">
+              <p className="card-text m-0">
+                <small className="text-muted">
+                  Ngày đăng: {topic.date.split("T")[0]}
+                </small>
+              </p>
+              {(auth.isCreator(Profile.getUserRole()) &&
+                Profile.getUserId() === topic.userID) ||
+              auth.isAdmin(Profile.getUserRole()) ? (
+                <div className="d-flex admin-options">
+                  <Link
+                    to={{
+                      pathname: `/topics/edit/${topic._id}`,
+                      state: {
+                        userID: topic.userID,
+                      },
+                    }}
+                    className="btn btn-sm btn-warning mr-2"
+                  >
+                    Chỉnh sửa
+                  </Link>
+                  <p
+                    href="#"
+                    onClick={() => {
+                      deleteTopic(topic._id, topic.userID);
+                    }}
+                    className="btn btn-sm btn-danger m-0"
+                  >
+                    Xoá
+                  </p>
+                </div>
+              ) : (
+                ""
+              )}
             </div>
+            <div></div>
           </div>
         </div>
       </div>
@@ -229,8 +207,8 @@ const Topics = (props) => {
       .delete("/api/topics/" + id)
       .then((response) => {
         setTopics(Topics.filter((el) => el._id !== id));
-      }).catch(e => AUTHENTICATE_ERROR(e.response.status));
-
+      })
+      .catch((e) => AUTHENTICATE_ERROR(e.response.status));
   };
 
   const changeLocation = (coor, id) => {
@@ -245,57 +223,56 @@ const Topics = (props) => {
   };
 
   return (
-    <div>
-      {/* Sort by */}
-      <div className="row mx-2">
-        <div className="dropdown col-12">
-          <button
-            className="btn border border-success dropdown-toggle"
-            type="button"
-            id="dropdownMenuButton"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-            id="sort-title"
+    <>
+      <div className="dropdown col-12 my-3">
+        <button
+          className="btn border border-success dropdown-toggle"
+          type="button"
+          id="dropdownMenuButton"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          id="sort-title"
+        >
+          {sortTitle}
+        </button>
+        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a
+            className="dropdown-item"
+            onClick={() => {
+              setSortOption("date");
+              setSortTitle("Bài viết mới");
+            }}
+            id="date"
           >
-            {sortTitle}
-          </button>
-          <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a
-              className="dropdown-item"
-              onClick={() => {
-                setSortOption("date");
-                setSortTitle("Bài viết mới");
-              }}
-              id="date"
-            >
-              Bài viết mới
-            </a>
-            <a
-              className="dropdown-item"
-              onClick={() => {
-                setSortOption("watch");
-                setSortTitle("Theo lượt xem");
-              }}
-              id="watch"
-            >
-              Lượt xem
-            </a>
-            <a
-              className="dropdown-item"
-              onClick={() => {
-                setSortOption("like");
-                setSortTitle("Theo lượt thích");
-              }}
-              id="like"
-            >
-              Lượt thích
-            </a>
-          </div>
+            Bài viết mới
+          </a>
+          <a
+            className="dropdown-item"
+            onClick={() => {
+              setSortOption("watch");
+              setSortTitle("Theo lượt xem");
+            }}
+            id="watch"
+          >
+            Lượt xem
+          </a>
+          <a
+            className="dropdown-item"
+            onClick={() => {
+              setSortOption("like");
+              setSortTitle("Theo lượt thích");
+            }}
+            id="like"
+          >
+            Lượt thích
+          </a>
         </div>
-        <div className="col-md-6 col-12 card-container">
-          {postData}
+      </div>
 
+      <div className="d-flex">
+        <div className="topics_container mr-2">
+          <div className="card-container">{postData}</div>
           <ReactPaginate
             previousLabel={"Trước"}
             previousClassName="page-item"
@@ -320,13 +297,14 @@ const Topics = (props) => {
             activeClassName={"active"}
           />
         </div>
+
         <div
           ref={(el) => (mapContainer.current = el)}
           id="map-container"
           className="map-container col-md-6 d-none d-md-block"
         ></div>
       </div>
-    </div>
+    </>
   );
 };
 
