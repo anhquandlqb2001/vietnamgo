@@ -91,7 +91,7 @@ function Control() {
       if (list[index].classList.contains("active")) {
         list[index].classList.remove("active");
       }
-      if (list[index].id == el) {
+      if (list[index].id === el) {
         document.getElementById(el).classList.add("active");
       }
     }
@@ -102,7 +102,7 @@ function Control() {
       if (list[index].classList.contains("active")) {
         list[index].classList.remove("active");
       }
-      if (list[index].id == el) {
+      if (list[index].id === el) {
         document.getElementById(el).classList.add("active");
         document.getElementById(
           "control-option"

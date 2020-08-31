@@ -8,6 +8,7 @@ export const AUTHENTICATE_ERROR = (status) => {
       break;
     case 403:
       window.location = "/";
+      break;
     default:
       break;
   }

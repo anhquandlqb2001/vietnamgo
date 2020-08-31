@@ -149,7 +149,7 @@ const NewTopic = () => {
             />
           </div>
           <div className="form-group col-md-6">
-            <label htmlFor="">Duong dan ban do</label>
+            <label htmlFor="">Đường dẫn bản đồ</label>
             <input
               type="text"
               className="form-control"
@@ -182,6 +182,7 @@ const NewTopic = () => {
                       src={URL.createObjectURL(file)}
                       key={index}
                       style={{ width: "200px", height: "200px" }}
+                      alt={index}
                     />
                   );
                 })}

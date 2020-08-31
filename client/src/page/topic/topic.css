@@ -1,7 +1,33 @@
 .img-thumbnail {
-  width: 80%;
-  height: 80vh !important;
+  width: 100%;
+  height: 50% !important;
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+.topic_details_body {
+  line-height: 1.35em;
+  white-space: pre-line;
+  line-break: auto;
+}
+
+.topic_details_map {
+  height: 500px;
+}
+
+.topic_map-container {
+  height: 90% !important;
+}
+
+
+@media only screen and (min-width: 1200px) {
+  .topic_details_map {
+    height: 700px;
+  }
+  
+  .topic_map-container {
+    height: 90% !important;
+  }
+  
 }

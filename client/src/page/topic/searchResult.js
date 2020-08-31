@@ -73,6 +73,7 @@ const Topics = (props) => {
       } else {
         document.getElementById(item.id).classList.remove("active");
       }
+      return;
     });
   }, [sortOption]);
 

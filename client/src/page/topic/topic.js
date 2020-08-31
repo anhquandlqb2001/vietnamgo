@@ -22,13 +22,11 @@ function Topic(props) {
   const [like, setLike] = useState(false);
   const [countLike, setCountLike] = useState(0);
   const [imgZoom, setImgZoom] = useState(null);
-
   const [offset, setoffset] = useState(0);
   const [perPage, setperPage] = useState(10);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(0);
-  const [isMobile, setIsMobile] = useState(null);
+  const [ImageLimit, setImageLimit] = useState(2);
   const mapContainer = useRef(null);
 
   useEffect(() => {
@@ -73,21 +71,6 @@ function Topic(props) {
   };
 
   useEffect(() => {
-    updateDimensions();
-    window.addEventListener("resize", updateDimensions);
-  }, [windowWidth]);
-
-  const updateDimensions = () => {
-    let width = typeof window !== "undefined" ? window.innerWidth : 0;
-    setWindowWidth(width);
-    if (windowWidth < 576) {
-      setIsMobile(true);
-    } else {
-      setIsMobile(false);
-    }
-  };
-
-  useEffect(() => {
     const initializeMap = ({ setMap, mapContainer }) => {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
@@ -99,11 +82,7 @@ function Topic(props) {
     if (topic.coor) initializeMap({ setMap, mapContainer });
   }, [topic.coor]);
 
-  const renderListImg = listImg.map((img, index) => {
-    const heightOfImgCon = document.getElementById("img-container")
-      .clientHeight;
-    const height = heightOfImgCon - 70 * listImg.length;
-    const margin = height / listImg.length;
+  const renderListImg = listImg.slice(0, ImageLimit).map((img, index) => {
     return (
       <img
         data-toggle="modal"
@@ -113,24 +92,19 @@ function Topic(props) {
         onClick={() => zoomImg(img.url)}
         className="card-img mb-md-2"
         id="img-item"
-        style={{ marginBottom: margin, width: '100%', height: 'auto', objectFit: 'cover' }}
+        style={{
+          width: "100%",
+          height: "auto",
+          objectFit: "cover",
+        }}
         key={index}
+        loading="lazy"
       />
     );
   });
 
   const zoomImg = (url) => {
     setImgZoom(url);
-  };
-
-  const imgThumb = () => {
-    if (topic.imageURL != null)
-      return (
-        <img
-        className="img-thumbnail"
-          src={topic.imageThumb ? topic.imageThumb.main : topic.imageURL[0].url}
-        ></img>
-      );
   };
 
   const commentList = comments.map((comment, index) => {
@@ -234,11 +208,24 @@ function Topic(props) {
           />
         </div>
       </div>
-      <div>{imgThumb()}</div>
+      <div>
+        {
+          <img
+            className="img-thumbnail"
+            src={
+              topic.imageThumb
+                ? topic.imageThumb.main
+                : topic.imageURL
+                ? topic.imageURL[0].url
+                : ""
+            }
+          ></img>
+        }
+      </div>
       <div className="container">
         <div className="row">
           <div className="jumbotron my-md-3 p-2 p-md-4 my-3 w-100">
-            <h1 className="display-4">{topic.title}</h1>
+            <h1 className="topic_details_title">{topic.title}</h1>
             <p className="lead">{topic.description}</p>
             <p className="lead text-info">{topic.address_pri}</p>
             <p className="lead text-info">{topic.address_sec}</p>
@@ -259,36 +246,42 @@ function Topic(props) {
           </div>
 
           <div className="d-flex w-100 justify-content-between">
-            <div className="col-7 card">
-              {!isMobile ? (
-                <ReactMarkdown className="text-body" source={topic.body} />
-              ) : (
-                <ReactMarkdown
-                  className="text-body"
-                  style={{ fontSize: "1rem", lineHeight: "1.2rem" }}
-                  source={topic.body}
-                />
-              )}
-            </div>
-
-            <div className="col-4 card px-md-2 px-1">
-              <div className="card-body p-md-2 p-0" id="img-container">
-                {renderListImg}
+            <div className="row">
+              <div className="col-md-8 col-12">
+                <div className="card">
+                  <ReactMarkdown
+                    className="text-body topic_details_body mx-1"
+                    source={topic.body}
+                  />
+                </div>
+              </div>
+              <div className="col-md-4 col-12">
+                <div className="card">
+                  <div className="card-body" id="img-container">
+                    {renderListImg}
+                  </div>
+                  <button
+                    className="btn btn-info w-50 mx-auto"
+                    onClick={() => setImageLimit(20)}
+                  >
+                    Xem thêm
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="card col-12 mt-5">
+          <div className="card col-12 mt-5 topic_details_map">
             <div className="card-body">
               <p className="card-title">Bản đồ</p>
               <div
                 ref={(el) => (mapContainer.current = el)}
-                className="map-container topic"
+                className="topic_map-container topic"
               ></div>
             </div>
           </div>
 
-          <div className="card col-12 mt-5">
+          <div className="card col-12 my-5">
             <div className="input-group mb-3 card-body">
               <textarea
                 type="text"

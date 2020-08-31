@@ -6,7 +6,6 @@ import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
 import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
-// import "../style.css";
 import "./topics.css";
 
 mapboxgl.accessToken =
@@ -74,9 +73,10 @@ const Topics = (props) => {
         document.getElementById(item.id).classList.remove("active");
       }
     });
+    getTopics()
   }, [sortOption]);
 
-  const sortTopics = (sortOption) => {
+  const sortTopics = (sortOption) => {  
     switch (sortOption) {
       case "date":
         setTopics(
@@ -203,6 +203,7 @@ const Topics = (props) => {
   });
 
   const deleteTopic = (id, userID) => {
+    console.log(id)
     axios
       .delete("/api/topics/" + id)
       .then((response) => {

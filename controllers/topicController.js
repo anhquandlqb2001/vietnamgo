@@ -169,6 +169,7 @@ class TopicController {
 
   async topics_details_delete(req, res) {
     try {
+      console.log(req.params.id)
       const topic = await TopicModel.findById(req.params.id);
       const location = await LocationModel.findOne({ address: topic.address_pri });
       location.totalWatch -= topic.watched;
@@ -181,7 +182,7 @@ class TopicController {
         })
       );
 
-      removeImageOnCloud(
+      topic.imageThumb && removeImageOnCloud(
         topic.imageThumb.id
       );
 

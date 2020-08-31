@@ -169,7 +169,7 @@ const EditTopic = (props) => {
             />
           </div>
           <div className="form-group col-md-6">
-            <label for="">Duong dan ban do</label>
+            <label for="">Đường dẫn bản đồ</label>
             <input
               type="text"
               className="form-control"

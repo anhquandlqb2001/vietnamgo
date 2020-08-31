@@ -174,14 +174,16 @@ const Queue = () => {
 
   return (
     <div className="container">
-      <div>
-        {Topics == "" ? (
+      <div className="d-flex" style={{flexDirection: "column"}}>
+        {Topics?.length === 0 ? (
           <h1 className="text-center">Chưa có bài viết nào</h1>
         ) : (
           ""
         )}
         {postData}
 
+        
+        <div className="mx-auto">
         <ReactPaginate
           previousLabel={"Trước"}
           previousClassName="page-item"
@@ -205,6 +207,7 @@ const Queue = () => {
           subContainerClassName={"pages pagination"}
           activeClassName={"active"}
         />
+        </div>
       </div>
     </div>
   );

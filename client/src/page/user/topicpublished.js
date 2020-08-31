@@ -132,13 +132,13 @@ function TopicPublished() {
         console.log(response.data);
       });
 
-    setTopics(Topics.filter((el) => el._id != id));
+    setTopics(Topics.filter((el) => el._id !== id));
   };
 
   return (
     <div style={{}} className="container">
       <div style={{}}>
-        {Topics == "" ? (
+        {Topics === "" ? (
           <h1 className="text-center">Chưa có bài viết nào</h1>
         ) : (
           ""
