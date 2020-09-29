@@ -4,4 +4,4 @@
     
 ## Link website
 
-[vietnamgo](vngo.herokuapp.com)
+[vietnamgo](http://vngo.herokuapp.com)
