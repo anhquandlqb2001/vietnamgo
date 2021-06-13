@@ -6,10 +6,10 @@ import Profile from "../../js/UserProfile";
 import auth from "../../js/auth";
 import mapboxgl from "mapbox-gl";
 import { AUTHENTICATE_ERROR } from "../../js/errorhandler";
+import {MAPBOXGL_TOKEN} from '../../js/config'
 import "./topics.css";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoicXVhbnByb2xhemVyIiwiYSI6ImNrYm5hZmttaDAxN3MyeGxtencyYWd2angifQ.VKBXUYphf13jquJZ4yJOGA";
+mapboxgl.accessToken = MAPBOXGL_TOKEN;
 
 const Topics = (props) => {
   const history = useHistory();
